@@ -4,15 +4,16 @@
 #include "mesh.hpp"
 #include "model.hpp"
 
-#include <iostream>
 #include <memory>
 #include <stdlib.h>
 
+constexpr uint32_t DEFAULT_WIDTH = 1600;
+constexpr uint32_t DEFAULT_HEIGHT = 900;
+
 int main(int argc, char* argv[]) {
-    auto width = 1600;
-    auto height = 900;
-//    auto width = 800;
-//    auto height = 450;
+    auto width = DEFAULT_WIDTH;
+    auto height = DEFAULT_HEIGHT;
+
     if (argc == 3) {
         width = atoi(argv[1]);
         height = atoi(argv[2]);

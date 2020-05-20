@@ -1,8 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
-
-#include <string>
 #include <memory>
 
 // Forward declare dependencies to reduce compilation-unit dependencies
