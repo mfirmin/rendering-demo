@@ -29,6 +29,7 @@ git clone git@github.com:mfirmin/model-viewer.git
 cd model-viewer
 mkdir build
 cd build
+ln -s ../assets .
 cmake ..
 make
 ./modelviewer
