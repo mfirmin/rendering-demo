@@ -6,7 +6,11 @@ Many of these techniques are based on the Advanced Lighting tutorials found here
 TODO
 - [ ] Antialiasing
   - [ ] MSAA (Directly supported by OpenGL)
-- [ ] Lighting
+- [ ] Basic Lighting
+  - [ ] Point Lights
+  - [ ] Directional Lights
+  - [ ] Spotlights
+- [ ] Advanced Lighting
   - [ ] Gamma Correction
   - [ ] HDR
   - [ ] Bloom
