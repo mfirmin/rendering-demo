@@ -45,6 +45,8 @@ bool Renderer::initializeSDL() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL could not be initialized\n";
     } else {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
         window = SDL_CreateWindow("Model Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
         if (window == nullptr) {
             std::cout << "Window could not be created!\n";
@@ -88,6 +90,14 @@ bool Renderer::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     // Enable writing to depth buffer
     glDepthMask(GL_TRUE);
+    // Enable MultiSampling
+    glEnable(GL_MULTISAMPLE);
+
+    int value = 0;
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &value);
+    std::cout << "MultiSampleBuffers: " << value << "\n";
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &value);
+    std::cout << "MultiSampleSamples: " << value << "\n";
 
     return true;
 }
