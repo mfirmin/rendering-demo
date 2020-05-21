@@ -4,11 +4,12 @@ Demo of various advanced 3D rendering techniques, implemented with SDL2 and Open
 Many of these techniques are based on the Advanced Lighting tutorials found here: https://learnopengl.com/
 
 TODO
-- [ ] Antialiasing
-  - [ ] MSAA (Directly supported by OpenGL)
-- [ ] Basic Lighting
-  - [ ] Point Lights
-  - [ ] Directional Lights
+- [X] Antialiasing
+  - [X] MSAA (Directly supported by OpenGL)
+  - [ ] MSAA for secondary framebuffers with texture attachments
+- [X] Basic Lighting
+  - [X] Point Lights
+  - [X] Directional Lights
   - [ ] Spotlights
 - [ ] Advanced Lighting
   - [ ] Gamma Correction
