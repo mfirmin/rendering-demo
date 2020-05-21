@@ -3,6 +3,10 @@
 #include <GL/glew.h>
 
 #include <glm/glm.hpp>
+#include <memory>
+#include <vector>
+
+class Light;
 
 class Material {
     public:
@@ -16,6 +20,8 @@ class Material {
         Material& operator=(Material&& other) = default;
 
         void setColor(glm::vec3 color);
+
+        void setLights(const std::vector<std::unique_ptr<Light>>& lights);
 
         void setProjectionAndViewMatrices(
             const glm::mat4& projectionMatrix,

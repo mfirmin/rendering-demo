@@ -1,5 +1,6 @@
 
 #include "camera.hpp"
+#include "light/directionalLight.hpp"
 #include "material.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
@@ -22,9 +23,17 @@ int main(int argc, char* argv[]) {
 
     auto aspect = static_cast<float>(width) / height;
 
+    auto sun = std::make_unique<DirectionalLight>(
+        glm::vec3(0.0f, 1.0f, -1.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        0.1f
+    );
+
     auto camera = std::make_unique<Camera>(aspect, 45.0f, glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto renderer = Renderer(width, height, std::move(camera));
+
+    renderer.addLight(std::move(sun));
 
     std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
     mesh->fromOBJ("assets/sphere.obj");

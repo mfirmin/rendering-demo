@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 
 #include "camera.hpp"
+#include "light/light.hpp"
 #include "model.hpp"
 
 #include <GL/glew.h>
@@ -93,7 +94,16 @@ bool Renderer::initializeGL() {
 
 void Renderer::addModel(Model&& model) {
     model.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+    model.setLights(lights);
     models.push_back(std::move(model));
+}
+
+void Renderer::addLight(std::unique_ptr<Light>&& light) {
+    lights.push_back(std::move(light));
+
+    for (auto& model : models) {
+        model.setLights(lights);
+    }
 }
 
 void Renderer::render() {

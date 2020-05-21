@@ -2,8 +2,10 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
 
 // Forward declare dependencies to reduce compilation-unit dependencies
+class Light;
 class Material;
 class Mesh;
 
@@ -28,6 +30,7 @@ class Model {
         // Therefore we have to define this in the .cpp file (even if it does nothing)
         ~Model();
 
+        void setLights(const std::vector<std::unique_ptr<Light>>& lights);
         void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
         void draw() const;
     private:

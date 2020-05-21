@@ -5,6 +5,7 @@
 #include <vector>
 
 class Camera;
+class Light;
 class Model;
 
 class Renderer {
@@ -18,6 +19,8 @@ class Renderer {
         Renderer& operator=(const Renderer& other) = delete;
 
         void addModel(Model&& model);
+        void addLight(std::unique_ptr<Light>&& light);
+
         void go();
 
         ~Renderer();
@@ -31,6 +34,8 @@ class Renderer {
         std::unique_ptr<Camera> camera;
 
         std::vector<Model> models;
+
+        std::vector<std::unique_ptr<Light>> lights;
 
         bool initializeSDL();
         bool initializeGL();

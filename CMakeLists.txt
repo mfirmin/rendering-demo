@@ -14,7 +14,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH "/usr/lib64")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# Target cpp 14
+# Target cpp 17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/build)
@@ -23,13 +23,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/build)
 find_package(SDL2 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(Freetype REQUIRED)
-find_package(nlohmann_json REQUIRED)
+# find_package(Freetype REQUIRED)
+# find_package(nlohmann_json REQUIRED)
 
 # add the include (header) directories for sdl2 and glew
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
-include_directories(${FREETYPE_INCLUDE_DIRS})
+# include_directories(${FREETYPE_INCLUDE_DIRS})
 include_directories(src include)
 #include_directories(${OpenGL_INCLUDE_DIRS})
 
@@ -44,6 +44,10 @@ set(SOURCES
     src/gl/shaderUtils.cpp
     src/gl/glObject.cpp
     src/camera.cpp
+    src/light/light.cpp
+    src/light/directionalLight.cpp
+    src/light/pointLight.cpp
+    src/light/spotLight.cpp
     src/material.cpp
     src/mesh.cpp
     src/model.cpp
@@ -59,4 +63,4 @@ add_executable(modelviewer
 target_link_libraries(modelviewer ${SDL2_LIBRARIES})
 target_link_libraries(modelviewer ${FREETYPE_LIBRARIES})
 target_link_libraries(modelviewer ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
-target_link_libraries(modelviewer nlohmann_json::nlohmann_json)
+# target_link_libraries(modelviewer nlohmann_json::nlohmann_json)

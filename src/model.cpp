@@ -29,6 +29,10 @@ Model& Model::operator=(Model&& other) {
     return *this;
 }
 
+void Model::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
+    material->setLights(lights);
+}
+
 void Model::setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix) {
     material->setProjectionAndViewMatrices(projectionMatrix, viewMatrix);
 }
