@@ -1,6 +1,7 @@
 
 #include "camera.hpp"
 #include "light/directionalLight.hpp"
+#include "light/pointLight.hpp"
 #include "material.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
@@ -24,9 +25,16 @@ int main(int argc, char* argv[]) {
     auto aspect = static_cast<float>(width) / height;
 
     auto sun = std::make_unique<DirectionalLight>(
-        glm::vec3(0.0f, 1.0f, -1.0f),
+        glm::vec3(-3.0f, 1.0f, -3.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
-        0.1f
+        0.2f
+    );
+
+    auto spark = std::make_unique<PointLight>(
+        glm::vec3(0.45f, -0.2f, -1.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        0.0f,
+        0.0f
     );
 
     auto camera = std::make_unique<Camera>(aspect, 45.0f, glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -34,11 +42,15 @@ int main(int argc, char* argv[]) {
     auto renderer = Renderer(width, height, std::move(camera));
 
     renderer.addLight(std::move(sun));
+    renderer.addLight(std::move(spark));
 
     std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
     mesh->fromOBJ("assets/sphere.obj");
 
-    std::unique_ptr<Material> material = std::make_unique<Material>();
+    std::unique_ptr<Material> material = std::make_unique<Material>(
+        glm::vec3(0.75164, 0.60648, 0.22648),
+        32.0f
+    );
 
     Model bunny(std::move(mesh), std::move(material));
 

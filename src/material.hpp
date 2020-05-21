@@ -10,7 +10,7 @@ class Light;
 
 class Material {
     public:
-        Material(glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0));
+        Material(glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0), float shininess = 32.0f);
         ~Material();
 
         Material(Material&& other) = default;
@@ -20,6 +20,8 @@ class Material {
         Material& operator=(Material&& other) = default;
 
         void setColor(glm::vec3 color);
+
+        void setShininess(float shininess);
 
         void setLights(const std::vector<std::unique_ptr<Light>>& lights);
 

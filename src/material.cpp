@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-Material::Material(glm::vec3 color) {
+Material::Material(glm::vec3 color, float shininess) {
     const GLchar* vertexShaderSource[] = {
         R"(
         #version 330
@@ -42,7 +42,6 @@ Material::Material(glm::vec3 color) {
         uniform mat4 viewMatrix;
 
         uniform vec3 color;
-        uniform vec3 specularColor;
         uniform float shininess;
 
         in vec3 vNormalEyespace;
@@ -87,9 +86,6 @@ Material::Material(glm::vec3 color) {
 
                 float specularCoefficient = 0.0;
 
-                // TODO: FIXME
-                vec3 specular = vec3(0.0);
-
                 if (diffuseCoefficient > 0.0) {
                     specularCoefficient = pow(
                         max(
@@ -102,6 +98,8 @@ Material::Material(glm::vec3 color) {
                         shininess
                     );
                 }
+
+                vec3 specular = specularCoefficient * inColor * light.color;
 
                 // TODO: Shadows
 
@@ -132,14 +130,12 @@ Material::Material(glm::vec3 color) {
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
     auto modelMatrixLocation = glGetUniformLocation(program, "modelMatrix");
     auto colorLocation = glGetUniformLocation(program, "color");
-    auto specularColorLocation = glGetUniformLocation(program, "specularColor");
     auto shininessLocation = glGetUniformLocation(program, "shininess");
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniform3fv(colorLocation, 1, glm::value_ptr(color));
-    glUniform3fv(specularColorLocation, 1, glm::value_ptr(color));
-    glUniform1f(shininessLocation, 0.0f);
+    glUniform1f(shininessLocation, shininess);
     glUseProgram(0);
 }
 
@@ -148,9 +144,14 @@ Material::~Material() {}
 void Material::setColor(glm::vec3 color) {
     glUseProgram(program);
     auto colorLocation = glGetUniformLocation(program, "color");
-    auto specularColorLocation = glGetUniformLocation(program, "specularColor");
     glUniform3fv(colorLocation, 1, glm::value_ptr(color));
-    glUniform3fv(specularColorLocation, 1, glm::value_ptr(color));
+    glUseProgram(0);
+}
+
+void Material::setShininess(float shininess) {
+    glUseProgram(program);
+    auto shininessLocation = glGetUniformLocation(program, "shininess");
+    glUniform1f(shininessLocation, shininess);
     glUseProgram(0);
 }
 
