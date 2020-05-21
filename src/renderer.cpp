@@ -1,5 +1,6 @@
 #include "renderer.hpp"
 
+#include "camera.hpp"
 #include "model.hpp"
 
 #include <GL/glew.h>
@@ -13,9 +14,10 @@ constexpr GLuint GL_MINOR = 3;
 constexpr float ONE_SECOND = 1000.0f;
 constexpr float FPS = 60.0f;
 
-Renderer::Renderer(int width, int height) :
+Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     width(width),
-    height(height)
+    height(height),
+    camera(std::move(camera))
 {
     std::cout << "Initializing SDL...\n";
     if (!initializeSDL()) {
@@ -90,6 +92,7 @@ bool Renderer::initializeGL() {
 }
 
 void Renderer::addModel(Model&& model) {
+    model.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
     models.push_back(std::move(model));
 }
 
@@ -99,6 +102,10 @@ void Renderer::render() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    for (const auto& model : models) {
+        model.draw();
+    }
 
     // Bind back to screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

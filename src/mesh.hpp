@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gl/glObject.hpp"
+
 #include <string>
 
 class Mesh {
@@ -14,5 +16,14 @@ class Mesh {
         Mesh& operator=(Mesh&& other) = default;
 
         Mesh& fromOBJ(std::string filename);
+
+        GLuint getVertexArrayObject() {
+            return vertexArrayObject.getVertexArrayObject();
+        }
+
+        uint16_t getVertexCount() {
+            return vertexArrayObject.getVertexCount();
+        }
     private:
+        GLObject vertexArrayObject = {};
 };

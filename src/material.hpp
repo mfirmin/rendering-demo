@@ -1,8 +1,12 @@
 #pragma once
 
+#include <GL/glew.h>
+
+#include <glm/glm.hpp>
+
 class Material {
     public:
-        Material();
+        Material(glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0));
         ~Material();
 
         Material(Material&& other) = default;
@@ -10,5 +14,23 @@ class Material {
 
         Material& operator=(const Material& other) = default;
         Material& operator=(Material&& other) = default;
+
+        void setColor(glm::vec3 color);
+
+        void setProjectionAndViewMatrices(
+            const glm::mat4& projectionMatrix,
+            const glm::mat4& viewMatrix
+        );
+
+        void setMatrices(
+            const glm::mat4& projectionMatrix,
+            const glm::mat4& viewMatrix,
+            const glm::mat4& modelMatrix
+        );
+
+        GLuint getProgram() {
+            return program;
+        }
     private:
+        GLuint program;
 };

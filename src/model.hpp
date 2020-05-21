@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <memory>
 
 // Forward declare dependencies to reduce compilation-unit dependencies
@@ -8,8 +9,8 @@ class Mesh;
 
 class Model {
     public:
-        // ctor. Takes in unique pointer references.
-        Model(std::unique_ptr<Mesh>& mesh, std::unique_ptr<Material>& material);
+        // ctor. Takes in rvalue pointer references.
+        Model(std::unique_ptr<Mesh>&& mesh, std::unique_ptr<Material>&& material);
         // Move ctor
         Model(Model&& other);
         // Move assignment operator
@@ -26,6 +27,9 @@ class Model {
         // of incomplete types
         // Therefore we have to define this in the .cpp file (even if it does nothing)
         ~Model();
+
+        void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
+        void draw() const;
     private:
         std::unique_ptr<Mesh> mesh;
         std::unique_ptr<Material> material;

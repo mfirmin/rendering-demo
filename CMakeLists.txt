@@ -41,10 +41,13 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 # set the sources for the executable
 set(SOURCES 
-    src/renderer.cpp
+    src/gl/shaderUtils.cpp
+    src/gl/glObject.cpp
+    src/camera.cpp
     src/material.cpp
     src/mesh.cpp
     src/model.cpp
+    src/renderer.cpp
 )
 
 # Add the executable
