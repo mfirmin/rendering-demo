@@ -6,7 +6,7 @@ Many of these techniques are based on the Advanced Lighting tutorials found here
 TODO
 - [X] Antialiasing
   - [X] MSAA (Directly supported by OpenGL)
-  - [ ] MSAA for secondary framebuffers with texture attachments
+  - [X] MSAA for secondary framebuffers with texture attachments
 - [X] Basic Lighting
   - [X] Point Lights
   - [X] Directional Lights
