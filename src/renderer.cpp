@@ -1,8 +1,10 @@
 #include "renderer.hpp"
 
 #include "camera.hpp"
+#include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
 #include "model.hpp"
+#include "renderTarget.hpp"
 
 #include <GL/glew.h>
 
@@ -25,11 +27,16 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
         std::cout << "Failed to initialize SDL\n";
         return;
     }
+
     std::cout << "Initializing GL...\n";
     if (!initializeGL()) {
         std::cout << "Failed to initialize GL\n";
         return;
     }
+
+    initializeScreenObject();
+
+    sceneTarget = std::make_unique<RenderTarget>(width, height);
 
     std::cout << "Ready\n";
 }
@@ -102,6 +109,79 @@ bool Renderer::initializeGL() {
     return true;
 }
 
+void Renderer::initializeScreenObject() {
+    glGenVertexArrays(1, &screenObject.vertexArray);
+    glGenBuffers(1, &screenObject.vertexBuffer);
+    glGenBuffers(1, &screenObject.uvBuffer);
+
+    glBindVertexArray(screenObject.vertexArray);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, screenObject.vertexBuffer);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    // NDC Coords
+    std::vector<float> vertices = {
+        -1.0f, -1.0f,
+        1.0f, -1.0f,
+        -1.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GL_FLOAT), vertices.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, screenObject.uvBuffer);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    std::vector<float> uvs = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(GL_FLOAT), uvs.data(), GL_STATIC_DRAW);
+
+    const GLchar* vertexShaderSource[] = {
+        R"(
+        #version 330
+        layout(location = 0) in vec2 position;
+        layout(location = 1) in vec2 uv;
+
+        out vec2 vUv;
+
+        void main() {
+            vUv = uv;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+        )"
+    };
+
+    const GLchar* fragmentShaderSource[] = {
+        R"(
+        #version 330
+
+        uniform sampler2D scene;
+
+        in vec2 vUv;
+
+        out vec4 fragColor;
+
+        void main() {
+            vec4 color = texture(scene, vUv);
+            fragColor = color;
+        }
+        )"
+    };
+
+    screenObject.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
+
+    if (screenObject.program == 0) {
+        return;
+    }
+}
+
 void Renderer::addModel(Model&& model) {
     model.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
     model.setLights(lights);
@@ -117,18 +197,36 @@ void Renderer::addLight(std::unique_ptr<Light>&& light) {
 }
 
 void Renderer::render() {
+    // Bind the scene buffer
+    if (sceneTarget != nullptr) {
+        glBindFramebuffer(GL_FRAMEBUFFER, sceneTarget->getFramebuffer());
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    for (const auto& model : models) {
+        model.draw();
+    }
+
     // Bind the screen framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (const auto& model : models) {
-        model.draw();
-    }
+    // render the screen object to it (using the scene render target)
+    glBindVertexArray(screenObject.vertexArray);
+    glUseProgram(screenObject.program);
 
-    // Bind back to screen
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE0);
+
+    glBindTexture(GL_TEXTURE_2D, sceneTarget->getTexture());
+    glUniform1i(glGetUniformLocation(screenObject.program, "scene"), 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glUseProgram(0);
+
     // Swap
     SDL_GL_SwapWindow(window);
 }

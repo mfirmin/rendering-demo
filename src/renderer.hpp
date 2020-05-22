@@ -4,9 +4,12 @@
 #include <SDL2/SDL.h>
 #include <vector>
 
+#include <GL/glew.h>
+
 class Camera;
 class Light;
 class Model;
+class RenderTarget;
 
 class Renderer {
     public:
@@ -37,8 +40,20 @@ class Renderer {
 
         std::vector<std::unique_ptr<Light>> lights;
 
+        std::unique_ptr<RenderTarget> sceneTarget;
+
+        struct {
+            GLuint vertexArray = 0;
+            GLuint vertexBuffer = 0;
+            GLuint uvBuffer = 0;
+
+            GLuint program;
+        } screenObject;
+
         bool initializeSDL();
         bool initializeGL();
+
+        void initializeScreenObject();
 
         void handleEvents(bool& quit);
 

@@ -52,6 +52,7 @@ set(SOURCES
     src/mesh.cpp
     src/model.cpp
     src/renderer.cpp
+    src/renderTarget.cpp
 )
 
 # Add the executable
