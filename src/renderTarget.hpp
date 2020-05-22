@@ -15,22 +15,26 @@ class RenderTarget {
 
         ~RenderTarget();
 
-        GLuint getFramebuffer() {
-            return buffer;
+        GLuint getMultiSampleFramebuffer() {
+            return msFBO;
+        }
+
+        GLuint getOutputFramebuffer() {
+            return outFBO;
         }
 
         GLuint getTexture() {
             return texture;
         }
-
-        GLuint getDepthBuffer() {
-            return depthBuffer;
-        }
     private:
         int width;
         int height;
 
-        GLuint texture = 0;
-        GLuint buffer = 0;
+        GLuint msFBO = 0;
+        GLuint msTexture = 0;
+        GLuint colorBuffer = 0;
         GLuint depthBuffer = 0;
+
+        GLuint outFBO = 0;
+        GLuint texture = 0;
 };

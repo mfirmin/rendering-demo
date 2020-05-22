@@ -52,8 +52,6 @@ bool Renderer::initializeSDL() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL could not be initialized\n";
     } else {
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
         window = SDL_CreateWindow("Model Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
         if (window == nullptr) {
             std::cout << "Window could not be created!\n";
@@ -197,16 +195,20 @@ void Renderer::addLight(std::unique_ptr<Light>&& light) {
 }
 
 void Renderer::render() {
+    auto msFBO = sceneTarget->getMultiSampleFramebuffer();
+    auto outFBO = sceneTarget->getOutputFramebuffer();
     // Bind the scene buffer
-    if (sceneTarget != nullptr) {
-        glBindFramebuffer(GL_FRAMEBUFFER, sceneTarget->getFramebuffer());
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+    glBindFramebuffer(GL_FRAMEBUFFER, msFBO);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (const auto& model : models) {
         model.draw();
     }
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, msFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFBO);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     // Bind the screen framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
