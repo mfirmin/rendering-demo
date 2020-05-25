@@ -1,6 +1,8 @@
 # model-viewer
 Demo of various advanced 3D rendering techniques, implemented with SDL2 and OpenGL 
 
+![demo](./emissive.png)
+
 Many of these techniques are based on the Advanced Lighting tutorials found here: https://learnopengl.com/
 
 TODO
