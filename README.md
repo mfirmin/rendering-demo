@@ -46,6 +46,6 @@ make
 
 # Usage
 
-`A` - Toggle AntiAliasing
-`L` - Toggle Primary Lighting
-`1-4` - Toggle Scene Lights
+- `A`: Toggle AntiAliasing
+- `L`: Toggle Primary Lighting
+- `1-4`: Toggle Scene Lights
