@@ -14,8 +14,9 @@ TODO
   - [X] Directional Lights
   - [ ] Spotlights
 - [ ] Advanced Lighting
+  - [ ] Blinn-Phong Shading
   - [ ] Gamma Correction
-  - [ ] Emissive Lighting
+  - [X] Emissive Lighting
   - [ ] HDR
   - [ ] Bloom
   - [ ] Deferred Shading
