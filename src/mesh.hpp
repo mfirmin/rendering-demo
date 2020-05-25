@@ -2,6 +2,7 @@
 
 #include "gl/glObject.hpp"
 
+#include <memory>
 #include <string>
 
 class Mesh {
@@ -18,12 +19,13 @@ class Mesh {
         Mesh& fromOBJ(std::string filename);
 
         GLuint getVertexArrayObject() {
-            return vertexArrayObject.getVertexArrayObject();
+            return vertexArrayObject->getVertexArrayObject();
         }
 
         uint16_t getVertexCount() {
-            return vertexArrayObject.getVertexCount();
+            return vertexArrayObject->getVertexCount();
         }
     private:
-        GLObject vertexArrayObject = {};
+        // should be able to share a GLObject between different mesh entities
+        std::shared_ptr<GLObject> vertexArrayObject = nullptr;
 };

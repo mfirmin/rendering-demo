@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
     // renderer.addLight(std::move(sun));
     // renderer.addLight(std::move(sun2));
 
-    std::unique_ptr<Mesh> mesh = std::make_unique<Mesh>();
-    mesh->fromOBJ("assets/sphere.obj");
+    std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>();
+    sphereMesh->fromOBJ("assets/sphere.obj");
 
     std::unique_ptr<Material> material = std::make_unique<Material>(
         glm::vec3(0.75164, 0.60648, 0.22648),
@@ -52,12 +52,12 @@ int main(int argc, char* argv[]) {
         32.0f
     );
 
-    Model sphere(std::move(mesh), std::move(material));
+    Model sphere(sphereMesh, std::move(material));
 
     renderer.addModel(std::move(sphere));
 
 
-    std::unique_ptr<Mesh> boxMesh = std::make_unique<Mesh>();
+    std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
     boxMesh->fromOBJ("assets/box.obj");
 
     std::unique_ptr<Material> boxMaterial = std::make_unique<Material>(
@@ -68,12 +68,8 @@ int main(int argc, char* argv[]) {
 
     boxMaterial->setSide(Side::BACK);
 
-    Model box(std::move(boxMesh), std::move(boxMaterial));
+    Model box(boxMesh, std::move(boxMaterial));
     renderer.addModel(std::move(box));
-
-
-    std::unique_ptr<Mesh> lightMesh = std::make_unique<Mesh>();
-    lightMesh->fromOBJ("assets/sphere.obj");
 
     std::unique_ptr<Material> lightMaterial = std::make_unique<Material>(
         glm::vec3(0.8f, 0.6f, 0.4f),
@@ -83,7 +79,7 @@ int main(int argc, char* argv[]) {
 
     lightMaterial->setEmissiveColorAndStrength(glm::vec3(0.8f, 0.6f, 0.4f), 1.0f);
 
-    Model light(std::move(lightMesh), std::move(lightMaterial));
+    Model light(sphereMesh, std::move(lightMaterial));
     light.setScale(0.1f);
     light.setPosition(glm::vec3(-1.0f, -1.0f, -1.0f));
 
@@ -98,9 +94,6 @@ int main(int argc, char* argv[]) {
 
     renderer.addLight(std::move(lightLight));
 
-    std::unique_ptr<Mesh> light2Mesh = std::make_unique<Mesh>();
-    light2Mesh->fromOBJ("assets/sphere.obj");
-
     std::unique_ptr<Material> light2Material = std::make_unique<Material>(
         glm::vec3(0.2f, 0.9f, 0.5f),
         0.5f,
@@ -109,7 +102,7 @@ int main(int argc, char* argv[]) {
 
     light2Material->setEmissiveColorAndStrength(glm::vec3(0.2f, 0.9f, 0.5f), 1.0f);
 
-    Model light2(std::move(light2Mesh), std::move(light2Material));
+    Model light2(sphereMesh, std::move(light2Material));
     light2.setScale(0.1f);
     light2.setPosition(glm::vec3(1.0f, 1.0f, -1.0f));
 

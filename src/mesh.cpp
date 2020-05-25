@@ -86,8 +86,7 @@ Mesh& Mesh::fromOBJ(std::string filename) {
 
     ifs.close();
 
-    vertexArrayObject.setVertices(std::move(vertices));
-    vertexArrayObject.setNormals(std::move(normals));
+    vertexArrayObject = std::make_shared<GLObject>(std::move(vertices), std::move(normals));
 
     return *this;
 }

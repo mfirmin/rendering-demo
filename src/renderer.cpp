@@ -100,12 +100,6 @@ bool Renderer::initializeGL() {
     // Enable face culling
     glEnable(GL_CULL_FACE);
 
-    int value = 0;
-    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &value);
-    std::cout << "MultiSampleBuffers: " << value << "\n";
-    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &value);
-    std::cout << "MultiSampleSamples: " << value << "\n";
-
     return true;
 }
 

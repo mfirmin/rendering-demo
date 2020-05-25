@@ -12,7 +12,7 @@ class Mesh;
 class Model {
     public:
         // ctor. Takes in rvalue pointer references.
-        Model(std::unique_ptr<Mesh>&& mesh, std::unique_ptr<Material>&& material);
+        Model(std::shared_ptr<Mesh> mesh, std::unique_ptr<Material>&& material);
         // Move ctor
         Model(Model&& other);
         // Move assignment operator
@@ -62,6 +62,8 @@ class Model {
 
         bool dirty = true;
 
-        std::unique_ptr<Mesh> mesh;
+        // Meshes can be shared between models
+        std::shared_ptr<Mesh> mesh;
+        // Materials must be unique (for now?)
         std::unique_ptr<Material> material;
 };
