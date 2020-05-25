@@ -27,6 +27,10 @@ class Material {
 
         void setLights(const std::vector<std::unique_ptr<Light>>& lights);
 
+        void setEmissiveColorAndStrength(glm::vec3 color, float strength);
+
+        void setModelMatrix(const glm::mat4& modelMatrix);
+
         void setProjectionAndViewMatrices(
             const glm::mat4& projectionMatrix,
             const glm::mat4& viewMatrix

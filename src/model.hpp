@@ -33,7 +33,35 @@ class Model {
         void setLights(const std::vector<std::unique_ptr<Light>>& lights);
         void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
         void draw() const;
+
+        void setPosition(glm::vec3 p) {
+            position = p;
+            dirty = true;
+        }
+
+        void setRotation(glm::vec3 r) {
+            rotation = r;
+            dirty = true;
+        }
+
+        void setScale(glm::vec3 s) {
+            scale = s;
+            dirty = true;
+        }
+
+        void setScale(float s) {
+            scale = glm::vec3(s, s, s);
+            dirty = true;
+        }
+
+        void applyModelMatrix();
     private:
+        glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+        bool dirty = true;
+
         std::unique_ptr<Mesh> mesh;
         std::unique_ptr<Material> material;
 };

@@ -44,6 +44,9 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
         uniform vec3 color;
         uniform float shininess;
 
+        uniform vec3 emissiveColor;
+        uniform float emissiveStrength;
+
         uniform float specularCoefficient;
 
         in vec3 vNormalEyespace;
@@ -109,7 +112,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
             }
 
             // TODO: Gamma correction
-            return outColor;
+            return outColor + emissiveColor * emissiveStrength;
         }
 
         void main() {
@@ -138,12 +141,16 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
     auto colorLocation = glGetUniformLocation(program, "color");
     auto shininessLocation = glGetUniformLocation(program, "shininess");
     auto specularCoefficientLocation = glGetUniformLocation(program, "specularCoefficient");
+    auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
+    auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniform3fv(colorLocation, 1, glm::value_ptr(color));
     glUniform1f(shininessLocation, shininess);
     glUniform1f(specularCoefficientLocation, specularCoefficient);
+    glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
+    glUniform1f(emissiveStrengthLocation, 0.0f);
     glUseProgram(0);
 }
 
@@ -153,6 +160,15 @@ void Material::setColor(glm::vec3 color) {
     glUseProgram(program);
     auto colorLocation = glGetUniformLocation(program, "color");
     glUniform3fv(colorLocation, 1, glm::value_ptr(color));
+    glUseProgram(0);
+}
+
+void Material::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
+    glUseProgram(program);
+    auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
+    auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
+    glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
+    glUniform1f(emissiveStrengthLocation, strength);
     glUseProgram(0);
 }
 
@@ -225,6 +241,13 @@ void Material::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
         lightIndex++;
     }
 
+    glUseProgram(0);
+}
+
+void Material::setModelMatrix(const glm::mat4& modelMatrix) {
+    glUseProgram(program);
+    auto modelMatrixLocation = glGetUniformLocation(program, "modelMatrix");
+    glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUseProgram(0);
 }
 
