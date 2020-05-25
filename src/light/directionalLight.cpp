@@ -17,6 +17,7 @@ LightInfo DirectionalLight::getLightInfo() const {
         intensity,
         ambientCoefficient,
         attenuation,
+        enabled,
         0.0f,
         glm::vec3(0.0f)
     };

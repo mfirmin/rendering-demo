@@ -8,14 +8,10 @@
 
 #include <GL/glew.h>
 
-#include <chrono>
 #include <iostream>
 
 constexpr GLuint GL_MAJOR = 3;
 constexpr GLuint GL_MINOR = 3;
-
-constexpr float ONE_SECOND = 1000.0f;
-constexpr float FPS = 60.0f;
 
 Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     width(width),
@@ -190,6 +186,19 @@ void Renderer::addLight(std::shared_ptr<Light> light) {
     }
 }
 
+void Renderer::updateCameraRotation(glm::vec3 r) {
+    camera->addRotation(r);
+}
+
+void Renderer::toggleMSAA() {
+    if (MSAAEnabled) {
+        glDisable(GL_MULTISAMPLE);
+    } else {
+        glEnable(GL_MULTISAMPLE);
+    }
+    MSAAEnabled = !MSAAEnabled;
+}
+
 void Renderer::render() {
     auto msFBO = sceneTarget->getMultiSampleFramebuffer();
     auto outFBO = sceneTarget->getOutputFramebuffer();
@@ -197,6 +206,17 @@ void Renderer::render() {
     glBindFramebuffer(GL_FRAMEBUFFER, msFBO);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (camera->isDirty()) {
+        for (auto& model : models) {
+            model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+        }
+        camera->setDirty(false);
+    }
+    // TODO(mfirmin): Check if lights are dirty
+    for (auto& model : models) {
+        model->setLights(lights);
+    }
 
     for (auto& model : models) {
         model->applyModelMatrix();
@@ -228,60 +248,4 @@ void Renderer::render() {
 
     // Swap
     SDL_GL_SwapWindow(window);
-}
-
-void Renderer::handleEvents(bool& quit) {
-    SDL_Event e;
-
-    while(SDL_PollEvent(&e) != 0) {
-        if (
-            e.type == SDL_QUIT ||
-            (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_ESCAPE)
-        ) {
-            quit = true;
-            return;
-        } else if (e.type == SDL_MOUSEBUTTONDOWN) {
-            mouseDown = true;
-        } else if (e.type == SDL_MOUSEMOTION) {
-            int x, y;
-            if (mouseDown) {
-                SDL_GetRelativeMouseState(&x, &y);
-                camera->addRotation(glm::vec3(-y / 100.0f, -x / 100.0f, 0.0f));
-            } else {
-                SDL_GetRelativeMouseState(&x, &y);
-            }
-        } else if (e.type == SDL_MOUSEBUTTONUP) {
-            mouseDown = false;
-        }
-    }
-}
-
-void Renderer::go() {
-    float frameLength = ONE_SECOND / FPS;
-    auto last = std::chrono::steady_clock::now();
-    bool quit = false;
-    while (!quit) {
-        auto now = std::chrono::steady_clock::now();
-        auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count();
-
-        if (dt >= frameLength) {
-            handleEvents(quit);
-            if (quit) {
-                break;
-            }
-            if (camera->isDirty()) {
-                for (auto& model : models) {
-                    model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
-                }
-                camera->setDirty(false);
-            }
-            // TODO(mfirmin): Check if lights are dirty
-            for (auto& model : models) {
-                model->setLights(lights);
-            }
-            render();
-            last = now;
-        }
-
-    }
 }

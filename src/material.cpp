@@ -59,6 +59,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
             float intensity;
             float ambientCoefficient;
             float attenuation;
+            float enabled;
             // spotlight only
             float coneAngle;
             vec3 coneDirection;
@@ -209,6 +210,7 @@ void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
         std::ostringstream intensityLocation;
         std::ostringstream attenuationLocation;
         std::ostringstream ambientCoefficientLocation;
+        std::ostringstream enabledLocation;
         std::ostringstream coneAngleLocation;
         std::ostringstream coneDirectionLocation;
 
@@ -217,6 +219,7 @@ void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
         intensityLocation << "lights[" << lightIndex << "].intensity";
         attenuationLocation << "lights[" << lightIndex << "].attenuation";
         ambientCoefficientLocation << "lights[" << lightIndex << "].ambientCoefficient";
+        enabledLocation << "lights[" << lightIndex << "].enabled";
         coneAngleLocation << "lights[" << lightIndex << "].coneAngle";
         coneDirectionLocation << "lights[" << lightIndex << "].coneDirection";
 
@@ -245,6 +248,11 @@ void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
         glUniform1f(
             glGetUniformLocation(program, ambientCoefficientLocation.str().c_str()),
             lightInfo.ambientCoefficient
+        );
+
+        glUniform1f(
+            glGetUniformLocation(program, enabledLocation.str().c_str()),
+            lightInfo.enabled ? 1.0f : 0.0f
         );
 
         glUniform1f(

@@ -8,6 +8,7 @@ typedef struct LightInfo {
     float intensity;
     float ambientCoefficient;
     float attenuation;
+    bool enabled;
     // spotlight only
     float coneAngle;
     glm::vec3 coneDirection;
@@ -44,6 +45,10 @@ class Light {
             intensity = i;
         }
 
+        void toggle() {
+            enabled = !enabled;
+        }
+
         virtual LightInfo getLightInfo() const = 0;
 
         virtual ~Light() {};
@@ -52,4 +57,5 @@ class Light {
         float intensity;
         float ambientCoefficient;
         float attenuation;
+        bool enabled;
 };

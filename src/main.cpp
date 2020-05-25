@@ -8,8 +8,13 @@
 #include "model.hpp"
 #include "renderer.hpp"
 
+#include <chrono>
+#include <GL/glew.h>
 #include <memory>
 #include <stdlib.h>
+
+constexpr float ONE_SECOND = 1000.0f;
+constexpr float FPS = 60.0f;
 
 constexpr uint32_t DEFAULT_WIDTH = 1600;
 constexpr uint32_t DEFAULT_HEIGHT = 900;
@@ -99,5 +104,63 @@ int main(int argc, char* argv[]) {
     renderer.addModel(lamp4.getModel());
     renderer.addLight(lamp4.getLight());
 
-    renderer.go();
+    float frameLength = ONE_SECOND / FPS;
+    auto last = std::chrono::steady_clock::now();
+    bool quit = false;
+
+    bool mouseDown = false;
+    while (!quit) {
+        auto now = std::chrono::steady_clock::now();
+        auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count();
+
+        if (dt >= frameLength) {
+            // handleEvents(quit);
+            if (quit) {
+                break;
+            }
+
+            // handle events
+
+            SDL_Event e;
+
+            while(SDL_PollEvent(&e) != 0) {
+                if (
+                    e.type == SDL_QUIT ||
+                    (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_ESCAPE)
+                ) {
+                    quit = true;
+                    break;
+                } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+                    mouseDown = true;
+                } else if (e.type == SDL_MOUSEMOTION) {
+                    int x = 0, y = 0;
+                    if (mouseDown) {
+                        SDL_GetRelativeMouseState(&x, &y);
+                        renderer.updateCameraRotation(glm::vec3(-static_cast<float>(y) / 100.0f, -static_cast<float>(x) / 100.0f, 0.0f));
+                    } else {
+                        SDL_GetRelativeMouseState(&x, &y);
+                    }
+                } else if (e.type == SDL_MOUSEBUTTONUP) {
+                    mouseDown = false;
+                } else if (e.type == SDL_KEYUP) {
+                    auto key = std::string(SDL_GetKeyName(e.key.keysym.sym));
+                    if (key == "A") {
+                        renderer.toggleMSAA();
+                    } else if (key == "1") {
+                        // if (lights.size() > 0) {
+                        //     lights[0]->toggle();
+                        // }
+                    }
+                }
+            }
+
+            if (quit) {
+                break;
+            }
+
+            renderer.render();
+            last = now;
+        }
+
+    }
 }

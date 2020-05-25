@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 class Camera;
 class Light;
@@ -24,7 +25,9 @@ class Renderer {
         void addModel(std::shared_ptr<Model> model);
         void addLight(std::shared_ptr<Light> light);
 
-        void go();
+        void render();
+        void toggleMSAA();
+        void updateCameraRotation(glm::vec3 r);
 
         ~Renderer();
     private:
@@ -52,12 +55,10 @@ class Renderer {
 
         bool mouseDown = false;
 
+        bool MSAAEnabled = true;
+
         bool initializeSDL();
         bool initializeGL();
 
         void initializeScreenObject();
-
-        void handleEvents(bool& quit);
-
-        void render();
 };

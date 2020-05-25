@@ -46,3 +46,5 @@ make
 
 # Usage
 TODO
+
+`A` - Toggle AntiAliasing

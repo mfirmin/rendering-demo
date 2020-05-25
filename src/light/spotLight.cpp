@@ -22,6 +22,7 @@ LightInfo SpotLight::getLightInfo() const {
         intensity,
         ambientCoefficient,
         attenuation,
+        enabled,
         coneAngle,
         coneDirection
     };
