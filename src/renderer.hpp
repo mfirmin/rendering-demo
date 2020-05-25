@@ -53,8 +53,6 @@ class Renderer {
             GLuint program;
         } screenObject;
 
-        bool mouseDown = false;
-
         bool MSAAEnabled = true;
 
         bool initializeSDL();

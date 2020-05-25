@@ -23,6 +23,7 @@ Lamp::Lamp(
     );
 
     material->setEmissiveColorAndStrength(color, intensity);
+    material->toggleEmissive(true);
 
     model = std::make_shared<Model>(mesh, std::move(material));
     model->setPosition(position);
@@ -38,6 +39,18 @@ Lamp::Lamp(
 }
 
 Lamp::~Lamp() {}
+
+void Lamp::toggle() {
+    light->toggle();
+
+    if (active) {
+        model->toggleEmissive(false);
+    } else {
+        model->toggleEmissive(true);
+    }
+
+    active = !active;
+}
 
 void Lamp::setColor(glm::vec3 color) {
     model->setColor(color);

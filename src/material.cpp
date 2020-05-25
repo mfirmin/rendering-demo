@@ -46,6 +46,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
 
         uniform vec3 emissiveColor;
         uniform float emissiveStrength;
+        uniform float emissiveEnabled;
 
         uniform float specularCoefficient;
 
@@ -70,6 +71,9 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
 
             for (int i = 0; i < numLights; i++) {
                 Light light = lights[i];
+                if (light.enabled < 0.5) {
+                    continue;
+                }
                 vec3 L;
                 float attenuation;
                 if (light.position.w == 0.0) {
@@ -114,7 +118,10 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
             }
 
             // TODO: Gamma correction
-            return outColor + emissiveColor * emissiveStrength;
+            if (emissiveEnabled > 0.5f) {
+                outColor += emissiveStrength * emissiveColor;
+            }
+            return outColor;
         }
 
         void main() {
@@ -145,6 +152,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
     auto specularCoefficientLocation = glGetUniformLocation(program, "specularCoefficient");
     auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
     auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
+    auto emissiveEnabledLocation = glGetUniformLocation(program, "emissiveEnabled");
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
@@ -153,6 +161,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
     glUniform1f(specularCoefficientLocation, specularCoefficient);
     glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
     glUniform1f(emissiveStrengthLocation, 0.0f);
+    glUniform1f(emissiveEnabledLocation, 0.0f);
     glUseProgram(0);
 }
 
@@ -184,6 +193,13 @@ void Material::setEmissiveStrength(float strength) {
     glUseProgram(program);
     auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
     glUniform1f(emissiveStrengthLocation, strength);
+    glUseProgram(0);
+}
+
+void Material::toggleEmissive(bool value) {
+    glUseProgram(program);
+    auto emissiveEnabledLocation = glGetUniformLocation(program, "emissiveEnabled");
+    glUniform1f(emissiveEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 

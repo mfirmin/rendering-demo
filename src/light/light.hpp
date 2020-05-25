@@ -57,5 +57,5 @@ class Light {
         float intensity;
         float ambientCoefficient;
         float attenuation;
-        bool enabled;
+        bool enabled = true;
 };

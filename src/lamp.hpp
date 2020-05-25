@@ -36,6 +36,8 @@ class Lamp {
         // Therefore we have to define this in the .cpp file (even if it does nothing)
         ~Lamp();
 
+        void toggle();
+
         void setColor(glm::vec3 c);
         void setIntensity(float i);
         void setPosition(glm::vec3 p);
@@ -55,4 +57,6 @@ class Lamp {
         std::shared_ptr<Model> model = nullptr;
         // Light
         std::shared_ptr<PointLight> light = nullptr;
+
+        bool active = true;
 };

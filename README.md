@@ -45,6 +45,7 @@ make
 ```
 
 # Usage
-TODO
 
 `A` - Toggle AntiAliasing
+`L` - Toggle Primary Lighting
+`1-4` - Toggle Scene Lights

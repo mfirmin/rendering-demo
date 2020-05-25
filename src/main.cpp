@@ -30,14 +30,14 @@ int main(int argc, char* argv[]) {
 
     auto aspect = static_cast<float>(width) / height;
 
-    auto sun = std::make_unique<DirectionalLight>(
+    auto sun = std::make_shared<DirectionalLight>(
         glm::vec3(-3.0f, 1.0f, -3.0f),
         glm::vec3(0.7f, 0.7f, 0.7f),
         1.0f,
         0.2f
     );
 
-    auto sun2 = std::make_unique<DirectionalLight>(
+    auto sun2 = std::make_shared<DirectionalLight>(
         glm::vec3(3.0f, 3.0f, 1.0f),
         glm::vec3(0.7f, 0.7f, 0.7f),
         1.0f,
@@ -45,11 +45,13 @@ int main(int argc, char* argv[]) {
     );
 
     auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-
     auto renderer = Renderer(width, height, std::move(camera));
 
-    // renderer.addLight(std::move(sun));
-    // renderer.addLight(std::move(sun2));
+    sun->toggle();
+    sun2->toggle();
+
+    renderer.addLight(sun);
+    renderer.addLight(sun2);
 
     std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>();
     sphereMesh->fromOBJ("assets/sphere.obj");
@@ -147,9 +149,17 @@ int main(int argc, char* argv[]) {
                     if (key == "A") {
                         renderer.toggleMSAA();
                     } else if (key == "1") {
-                        // if (lights.size() > 0) {
-                        //     lights[0]->toggle();
-                        // }
+                        lamp1.toggle();
+                    } else if (key == "2") {
+                        lamp2.toggle();
+                    } else if (key == "3") {
+                        lamp3.toggle();
+                    } else if (key == "4") {
+                        lamp4.toggle();
+                    } else if (key == "L") {
+                        // Primary Lighting
+                        sun->toggle();
+                        sun2->toggle();
                     }
                 }
             }

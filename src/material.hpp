@@ -31,6 +31,8 @@ class Material {
         void setEmissiveColor(glm::vec3 color);
         void setEmissiveStrength(float strength);
 
+        void toggleEmissive(bool value);
+
         void setModelMatrix(const glm::mat4& modelMatrix);
 
         void setProjectionAndViewMatrices(

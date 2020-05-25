@@ -48,6 +48,10 @@ void Model::setColor(glm::vec3 color) {
     material->setColor(color);
 }
 
+void Model::toggleEmissive(bool value) {
+    material->toggleEmissive(value);
+}
+
 void Model::setEmissiveColor(glm::vec3 color) {
     material->setEmissiveColor(color);
 }
