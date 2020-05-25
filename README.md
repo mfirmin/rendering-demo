@@ -13,6 +13,7 @@ TODO
   - [ ] Spotlights
 - [ ] Advanced Lighting
   - [ ] Gamma Correction
+  - [ ] Emissive Lighting
   - [ ] HDR
   - [ ] Bloom
   - [ ] Deferred Shading
