@@ -56,6 +56,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
         uniform struct Light {
             vec4 position;
             vec3 color;
+            float intensity;
             float ambientCoefficient;
             float attenuation;
             // spotlight only
@@ -84,10 +85,10 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
                 }
                 // TODO: Spotlights
 
-                vec3 ambient = light.ambientCoefficient * inColor * light.color;
+                vec3 ambient = light.ambientCoefficient * inColor * light.color * light.intensity;
 
                 float diffuseCoefficient = max(0.0, dot(N, L));
-                vec3 diffuse = diffuseCoefficient * inColor * light.color;
+                vec3 diffuse = diffuseCoefficient * inColor * light.color * light.intensity;
 
                 float specularTerm = 0.0;
 
@@ -104,7 +105,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
                     );
                 }
 
-                vec3 specular = specularCoefficient * specularTerm * inColor * light.color;
+                vec3 specular = specularCoefficient * specularTerm * inColor * light.color * light.intensity;
 
                 // TODO: Shadows
 
@@ -172,6 +173,19 @@ void Material::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
     glUseProgram(0);
 }
 
+void Material::setEmissiveColor(glm::vec3 color) {
+    glUseProgram(program);
+    auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
+    glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
+    glUseProgram(0);
+}
+void Material::setEmissiveStrength(float strength) {
+    glUseProgram(program);
+    auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
+    glUniform1f(emissiveStrengthLocation, strength);
+    glUseProgram(0);
+}
+
 void Material::setShininess(float shininess) {
     glUseProgram(program);
     auto shininessLocation = glGetUniformLocation(program, "shininess");
@@ -179,7 +193,7 @@ void Material::setShininess(float shininess) {
     glUseProgram(0);
 }
 
-void Material::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
+void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
     std::size_t lightIndex = 0;
 
     glUseProgram(program);
@@ -192,6 +206,7 @@ void Material::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
         // position
         std::ostringstream positionLocation;
         std::ostringstream colorLocation;
+        std::ostringstream intensityLocation;
         std::ostringstream attenuationLocation;
         std::ostringstream ambientCoefficientLocation;
         std::ostringstream coneAngleLocation;
@@ -199,6 +214,7 @@ void Material::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
 
         positionLocation << "lights[" << lightIndex << "].position";
         colorLocation << "lights[" << lightIndex << "].color";
+        intensityLocation << "lights[" << lightIndex << "].intensity";
         attenuationLocation << "lights[" << lightIndex << "].attenuation";
         ambientCoefficientLocation << "lights[" << lightIndex << "].ambientCoefficient";
         coneAngleLocation << "lights[" << lightIndex << "].coneAngle";
@@ -214,6 +230,11 @@ void Material::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
             glGetUniformLocation(program, colorLocation.str().c_str()),
             1,
             glm::value_ptr(lightInfo.color)
+        );
+
+        glUniform1f(
+            glGetUniformLocation(program, intensityLocation.str().c_str()),
+            lightInfo.intensity
         );
 
         glUniform1f(

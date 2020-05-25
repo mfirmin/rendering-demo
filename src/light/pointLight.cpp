@@ -3,10 +3,11 @@
 PointLight::PointLight(
     glm::vec3 position,
     glm::vec3 color,
+    float intensity,
     float ambientCoefficient,
     float attenuation
 ) :
-    Light(color, ambientCoefficient, attenuation),
+    Light(color, intensity, ambientCoefficient, attenuation),
     position(position)
 {}
 
@@ -14,6 +15,7 @@ LightInfo PointLight::getLightInfo() const {
     return {
         glm::vec4(position, 1.0f),
         color,
+        intensity,
         ambientCoefficient,
         attenuation,
         0.0f,

@@ -11,6 +11,7 @@ class SpotLight : public Light {
             float coneAngle,
             glm::vec3 coneDirection,
             glm::vec3 color,
+            float intensity,
             float ambientCoefficient,
             float attenuation
         );

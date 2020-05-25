@@ -30,7 +30,12 @@ class Model {
         // Therefore we have to define this in the .cpp file (even if it does nothing)
         ~Model();
 
-        void setLights(const std::vector<std::unique_ptr<Light>>& lights);
+        void setColor(glm::vec3 color);
+        void setEmissiveColorAndStrength(glm::vec3 color, float strength);
+        void setEmissiveColor(glm::vec3 color);
+        void setEmissiveStrength(float strength);
+
+        void setLights(const std::vector<std::shared_ptr<Light>>& lights);
         void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
         void draw() const;
 

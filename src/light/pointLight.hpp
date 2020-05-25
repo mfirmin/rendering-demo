@@ -9,6 +9,7 @@ class PointLight : public Light {
         PointLight(
             glm::vec3 position,
             glm::vec3 color,
+            float intensity,
             float ambientCoefficient,
             float attenuation
         );
@@ -20,6 +21,10 @@ class PointLight : public Light {
         PointLight& operator=(const PointLight& other) = default;
 
         ~PointLight() {};
+
+        void setPosition(glm::vec3 p) {
+            position = p;
+        }
 
         LightInfo getLightInfo() const override;
     private:

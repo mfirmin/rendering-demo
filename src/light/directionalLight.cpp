@@ -3,9 +3,10 @@
 DirectionalLight::DirectionalLight(
     glm::vec3 direction,
     glm::vec3 color,
+    float intensity,
     float ambientCoefficient
 ) :
-    Light(color, ambientCoefficient, 0.0f),
+    Light(color, intensity, ambientCoefficient, 0.0f),
     direction(direction)
 {}
 
@@ -13,6 +14,7 @@ LightInfo DirectionalLight::getLightInfo() const {
     return {
         glm::vec4(direction, 0.0f),
         color,
+        intensity,
         ambientCoefficient,
         attenuation,
         0.0f,

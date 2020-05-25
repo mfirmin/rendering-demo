@@ -176,17 +176,17 @@ void Renderer::initializeScreenObject() {
     }
 }
 
-void Renderer::addModel(Model&& model) {
-    model.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
-    model.setLights(lights);
-    models.push_back(std::move(model));
+void Renderer::addModel(std::shared_ptr<Model> model) {
+    model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+    model->setLights(lights);
+    models.push_back(model);
 }
 
-void Renderer::addLight(std::unique_ptr<Light>&& light) {
-    lights.push_back(std::move(light));
+void Renderer::addLight(std::shared_ptr<Light> light) {
+    lights.push_back(light);
 
     for (auto& model : models) {
-        model.setLights(lights);
+        model->setLights(lights);
     }
 }
 
@@ -199,8 +199,8 @@ void Renderer::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto& model : models) {
-        model.applyModelMatrix();
-        model.draw();
+        model->applyModelMatrix();
+        model->draw();
     }
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, msFBO);
@@ -271,9 +271,13 @@ void Renderer::go() {
             }
             if (camera->isDirty()) {
                 for (auto& model : models) {
-                    model.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+                    model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
                 }
                 camera->setDirty(false);
+            }
+            // TODO(mfirmin): Check if lights are dirty
+            for (auto& model : models) {
+                model->setLights(lights);
             }
             render();
             last = now;

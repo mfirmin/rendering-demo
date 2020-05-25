@@ -21,8 +21,8 @@ class Renderer {
         Renderer(const Renderer& other) = delete;
         Renderer& operator=(const Renderer& other) = delete;
 
-        void addModel(Model&& model);
-        void addLight(std::unique_ptr<Light>&& light);
+        void addModel(std::shared_ptr<Model> model);
+        void addLight(std::shared_ptr<Light> light);
 
         void go();
 
@@ -36,9 +36,9 @@ class Renderer {
 
         std::unique_ptr<Camera> camera;
 
-        std::vector<Model> models;
+        std::vector<std::shared_ptr<Model>> models;
 
-        std::vector<std::unique_ptr<Light>> lights;
+        std::vector<std::shared_ptr<Light>> lights;
 
         std::unique_ptr<RenderTarget> sceneTarget;
 

@@ -44,6 +44,7 @@ set(SOURCES
     src/gl/shaderUtils.cpp
     src/gl/glObject.cpp
     src/camera.cpp
+    src/lamp.cpp
     src/light/light.cpp
     src/light/directionalLight.cpp
     src/light/pointLight.cpp

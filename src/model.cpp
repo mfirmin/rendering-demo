@@ -44,7 +44,23 @@ Model& Model::operator=(Model&& other) {
     return *this;
 }
 
-void Model::setLights(const std::vector<std::unique_ptr<Light>>& lights) {
+void Model::setColor(glm::vec3 color) {
+    material->setColor(color);
+}
+
+void Model::setEmissiveColor(glm::vec3 color) {
+    material->setEmissiveColor(color);
+}
+
+void Model::setEmissiveStrength(float strength) {
+    material->setEmissiveStrength(strength);
+}
+
+void Model::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
+    material->setEmissiveColorAndStrength(color, strength);
+}
+
+void Model::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
     material->setLights(lights);
 }
 

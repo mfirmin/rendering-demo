@@ -9,6 +9,7 @@ class DirectionalLight : public Light {
         DirectionalLight(
             glm::vec3 direction,
             glm::vec3 color,
+            float intensity,
             float ambientCoefficient
         );
 

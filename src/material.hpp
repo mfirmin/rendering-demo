@@ -25,9 +25,11 @@ class Material {
 
         void setShininess(float shininess);
 
-        void setLights(const std::vector<std::unique_ptr<Light>>& lights);
+        void setLights(const std::vector<std::shared_ptr<Light>>& lights);
 
         void setEmissiveColorAndStrength(glm::vec3 color, float strength);
+        void setEmissiveColor(glm::vec3 color);
+        void setEmissiveStrength(float strength);
 
         void setModelMatrix(const glm::mat4& modelMatrix);
 

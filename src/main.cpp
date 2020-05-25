@@ -1,5 +1,6 @@
 
 #include "camera.hpp"
+#include "lamp.hpp"
 #include "light/directionalLight.hpp"
 #include "light/pointLight.hpp"
 #include "material.hpp"
@@ -27,12 +28,14 @@ int main(int argc, char* argv[]) {
     auto sun = std::make_unique<DirectionalLight>(
         glm::vec3(-3.0f, 1.0f, -3.0f),
         glm::vec3(0.7f, 0.7f, 0.7f),
+        1.0f,
         0.2f
     );
 
     auto sun2 = std::make_unique<DirectionalLight>(
         glm::vec3(3.0f, 3.0f, 1.0f),
         glm::vec3(0.7f, 0.7f, 0.7f),
+        1.0f,
         0.2f
     );
 
@@ -52,9 +55,9 @@ int main(int argc, char* argv[]) {
         32.0f
     );
 
-    Model sphere(sphereMesh, std::move(material));
+    std::shared_ptr<Model> sphere = std::make_shared<Model>(sphereMesh, std::move(material));
 
-    renderer.addModel(std::move(sphere));
+    renderer.addModel(sphere);
 
 
     std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
@@ -68,54 +71,33 @@ int main(int argc, char* argv[]) {
 
     boxMaterial->setSide(Side::BACK);
 
-    Model box(boxMesh, std::move(boxMaterial));
-    renderer.addModel(std::move(box));
+    std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
+    renderer.addModel(box);
 
-    std::unique_ptr<Material> lightMaterial = std::make_unique<Material>(
-        glm::vec3(0.8f, 0.6f, 0.4f),
-        0.5f,
-        8.0f
-    );
 
-    lightMaterial->setEmissiveColorAndStrength(glm::vec3(0.8f, 0.6f, 0.4f), 1.0f);
+    Lamp lamp1(sphereMesh, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.8f, 0.6f, 0.4f), 1.0f);
+    lamp1.setScale(0.1f);
 
-    Model light(sphereMesh, std::move(lightMaterial));
-    light.setScale(0.1f);
-    light.setPosition(glm::vec3(-1.0f, -1.0f, -1.0f));
+    renderer.addModel(lamp1.getModel());
+    renderer.addLight(lamp1.getLight());
 
-    renderer.addModel(std::move(light));
+    Lamp lamp2(sphereMesh, glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(0.2f, 0.9f, 0.5f), 1.0f);
+    lamp2.setScale(0.1f);
 
-    auto lightLight = std::make_unique<PointLight>(
-        glm::vec3(-1.0f, -1.0f, -1.0f),
-        glm::vec3(0.8f, 0.6f, 0.4f),
-        0.0f,
-        0.5f
-    );
+    renderer.addModel(lamp2.getModel());
+    renderer.addLight(lamp2.getLight());
 
-    renderer.addLight(std::move(lightLight));
+    Lamp lamp3(sphereMesh, glm::vec3(0.0f, 0.1f, 1.5f), glm::vec3(0.2f, 0.2f, 0.9f), 0.8f);
+    lamp3.setScale(0.2f);
 
-    std::unique_ptr<Material> light2Material = std::make_unique<Material>(
-        glm::vec3(0.2f, 0.9f, 0.5f),
-        0.5f,
-        8.0f
-    );
+    renderer.addModel(lamp3.getModel());
+    renderer.addLight(lamp3.getLight());
 
-    light2Material->setEmissiveColorAndStrength(glm::vec3(0.2f, 0.9f, 0.5f), 1.0f);
+    Lamp lamp4(sphereMesh, glm::vec3(-1.0f, 1.5f, 1.5f), glm::vec3(0.9f, 0.2f, 0.1f), 2.0f);
+    lamp4.setScale(0.05f);
 
-    Model light2(sphereMesh, std::move(light2Material));
-    light2.setScale(0.1f);
-    light2.setPosition(glm::vec3(1.0f, 1.0f, -1.0f));
-
-    renderer.addModel(std::move(light2));
-
-    auto light2Light = std::make_unique<PointLight>(
-        glm::vec3(1.0f, 1.0f, -1.0f),
-        glm::vec3(0.2f, 0.9f, 0.5f),
-        0.0f,
-        0.5f
-    );
-
-    renderer.addLight(std::move(light2Light));
+    renderer.addModel(lamp4.getModel());
+    renderer.addLight(lamp4.getLight());
 
     renderer.go();
 }

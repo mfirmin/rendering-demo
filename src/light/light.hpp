@@ -5,6 +5,7 @@
 typedef struct LightInfo {
     glm::vec4 position; // or direction if w = 0
     glm::vec3 color;
+    float intensity;
     float ambientCoefficient;
     float attenuation;
     // spotlight only
@@ -16,6 +17,7 @@ class Light {
     public:
         Light(
             glm::vec3 color,
+            float intensity,
             float ambientCoefficient,
             float attenuation
         );
@@ -26,11 +28,28 @@ class Light {
         Light(const Light& other) = default;
         Light& operator=(const Light& other) = default;
 
+        void setColor(glm::vec3 c) {
+            color = c;
+        }
+
+        void setAmbientCoefficient(float ac) {
+            ambientCoefficient = ac;
+        }
+
+        void setAttenuation(float a) {
+            attenuation = a;
+        }
+
+        void setIntensity(float i) {
+            intensity = i;
+        }
+
         virtual LightInfo getLightInfo() const = 0;
 
         virtual ~Light() {};
     protected:
         glm::vec3 color;
+        float intensity;
         float ambientCoefficient;
         float attenuation;
 };
