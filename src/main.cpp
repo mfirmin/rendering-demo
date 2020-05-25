@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
         0.0f
     );
 
-    auto camera = std::make_unique<Camera>(aspect, 45.0f, glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto renderer = Renderer(width, height, std::move(camera));
 
@@ -49,12 +49,28 @@ int main(int argc, char* argv[]) {
 
     std::unique_ptr<Material> material = std::make_unique<Material>(
         glm::vec3(0.75164, 0.60648, 0.22648),
+        0.5f,
         32.0f
     );
 
-    Model bunny(std::move(mesh), std::move(material));
+    Model sphere(std::move(mesh), std::move(material));
 
-    renderer.addModel(std::move(bunny));
+    renderer.addModel(std::move(sphere));
+
+
+    std::unique_ptr<Mesh> boxMesh = std::make_unique<Mesh>();
+    boxMesh->fromOBJ("assets/box.obj");
+
+    std::unique_ptr<Material> boxMaterial = std::make_unique<Material>(
+        glm::vec3(0.66, 0.66, 0.66),
+        0.5f,
+        8.0f
+    );
+
+    boxMaterial->setSide(Side::BACK);
+
+    Model box(std::move(boxMesh), std::move(boxMaterial));
+    renderer.addModel(std::move(box));
 
     renderer.go();
 }

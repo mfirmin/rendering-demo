@@ -1,13 +1,14 @@
 #include "mesh.hpp"
 
+#include "gl/glObject.hpp"
+
 #include <fstream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include <iostream>
 
-Mesh::Mesh() {}
-Mesh::~Mesh() {}
+Mesh::Mesh() { }
 
 /**
  * Reads a .obj file and populates this Mesh object.

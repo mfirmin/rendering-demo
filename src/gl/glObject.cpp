@@ -9,8 +9,7 @@ GLObject::GLObject() {
 GLObject::GLObject(
     std::vector<float>&& vs,
     std::vector<float>&& ns
-)
-{
+) {
     createVertexArrayObject();
     setVertices(std::move(vs));
     setNormals(std::move(ns));
@@ -21,9 +20,11 @@ void GLObject::createVertexArrayObject() {
 }
 
 void GLObject::setVertices(std::vector<float>&& vs) {
-    vertices = std::move(vs);
+    vertices.clear();
+    for (auto vtx : vs) {
+        vertices.push_back(vtx);
+    }
     vertexCount = vertices.size() / 3;
-    std::cout << vertexCount << "\n";
 
     if (vertexBuffer == 0) {
         glGenBuffers(1, &vertexBuffer);

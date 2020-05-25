@@ -6,11 +6,13 @@
 #include <memory>
 #include <vector>
 
+enum class Side { FRONT, BACK, BOTH };
+
 class Light;
 
 class Material {
     public:
-        Material(glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0), float shininess = 32.0f);
+        Material(glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0), float specularCoefficient = 0.5f, float shininess = 32.0f);
         ~Material();
 
         Material(Material&& other) = default;
@@ -39,6 +41,16 @@ class Material {
         GLuint getProgram() {
             return program;
         }
+
+        void setSide(Side s) {
+            side = s;
+        }
+
+        Side getSide() {
+            return side;
+        }
     private:
         GLuint program;
+
+        Side side = Side::FRONT;
 };

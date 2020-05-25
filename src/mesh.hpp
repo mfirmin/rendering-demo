@@ -7,7 +7,7 @@
 class Mesh {
     public:
         Mesh();
-        ~Mesh();
+        ~Mesh() = default;
 
         Mesh(Mesh&& other) = default;
         Mesh(const Mesh& other) = default;

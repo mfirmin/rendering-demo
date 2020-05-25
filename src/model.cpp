@@ -40,8 +40,20 @@ void Model::setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, cons
 void Model::draw() const {
     glUseProgram(material->getProgram());
 
+    auto side = material->getSide();
+
+    // TODO: Support both sides
+    if (side == Side::BACK) {
+        glCullFace(GL_FRONT);
+    } else {
+        glCullFace(GL_BACK);
+    }
+
     glBindVertexArray(mesh->getVertexArrayObject());
     glDrawArrays(GL_TRIANGLES, 0, mesh->getVertexCount());
+
+    // set back to BACK
+    glCullFace(GL_BACK);
 
     glUseProgram(0);
 }

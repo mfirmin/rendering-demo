@@ -31,7 +31,6 @@ class RenderTarget {
         int height;
 
         GLuint msFBO = 0;
-        GLuint msTexture = 0;
         GLuint colorBuffer = 0;
         GLuint depthBuffer = 0;
 

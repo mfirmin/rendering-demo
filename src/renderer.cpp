@@ -97,6 +97,8 @@ bool Renderer::initializeGL() {
     glDepthMask(GL_TRUE);
     // Enable MultiSampling
     glEnable(GL_MULTISAMPLE);
+    // Enable face culling
+    glEnable(GL_CULL_FACE);
 
     int value = 0;
     SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &value);
@@ -243,6 +245,18 @@ void Renderer::handleEvents(bool& quit) {
         ) {
             quit = true;
             return;
+        } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+            mouseDown = true;
+        } else if (e.type == SDL_MOUSEMOTION) {
+            int x, y;
+            if (mouseDown) {
+                SDL_GetRelativeMouseState(&x, &y);
+                camera->addRotation(glm::vec3(-y / 100.0f, -x / 100.0f, 0.0f));
+            } else {
+                SDL_GetRelativeMouseState(&x, &y);
+            }
+        } else if (e.type == SDL_MOUSEBUTTONUP) {
+            mouseDown = false;
         }
     }
 }
@@ -259,6 +273,12 @@ void Renderer::go() {
             handleEvents(quit);
             if (quit) {
                 break;
+            }
+            if (camera->isDirty()) {
+                for (auto& model : models) {
+                    model.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+                }
+                camera->setDirty(false);
             }
             render();
             last = now;
