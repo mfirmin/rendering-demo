@@ -1,4 +1,4 @@
-# model-viewer
+# 3D Rendering Demo
 Demo of various advanced 3D rendering techniques, implemented with SDL2 and OpenGL 
 
 ![demo](./emissive.png)
