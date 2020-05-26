@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Material> material = std::make_unique<Material>(
         glm::vec3(0.75164, 0.60648, 0.22648),
         0.5f,
-        32.0f
+        64.0f
     );
 
     std::shared_ptr<Model> sphere = std::make_shared<Model>(sphereMesh, std::move(material));
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Material> boxMaterial = std::make_unique<Material>(
         glm::vec3(0.66, 0.66, 0.66),
         0.5f,
-        8.0f
+        4.0f
     );
 
     boxMaterial->setSide(Side::BACK);
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
     renderer.addModel(lamp3.getModel());
     renderer.addLight(lamp3.getLight());
 
-    Lamp lamp4(sphereMesh, glm::vec3(-1.0f, 1.5f, 1.5f), glm::vec3(0.9f, 0.2f, 0.1f), 2.0f);
+    Lamp lamp4(sphereMesh, glm::vec3(-1.0f, 1.5f, 1.5f), glm::vec3(0.9f, 0.2f, 0.1f), 1.0f);
     lamp4.setScale(0.05f);
 
     renderer.addModel(lamp4.getModel());

@@ -90,6 +90,8 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
                 }
                 // TODO: Spotlights
 
+                vec3 H = normalize(L + E);
+
                 vec3 ambient = light.ambientCoefficient * inColor * light.color * light.intensity;
 
                 float diffuseCoefficient = max(0.0, dot(N, L));
@@ -102,8 +104,8 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
                         max(
                             0.0,
                             dot(
-                                E,
-                                reflect(-L, N)
+                                N,
+                                H
                             )
                         ),
                         shininess
