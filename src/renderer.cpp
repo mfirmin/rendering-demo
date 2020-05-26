@@ -199,6 +199,13 @@ void Renderer::toggleMSAA() {
     MSAAEnabled = !MSAAEnabled;
 }
 
+void Renderer::toggleBlinnPhongShading() {
+    blinnPhongShadingEnabled = !blinnPhongShadingEnabled;
+    for (auto model : models) {
+        model->toggleBlinnPhongShading(blinnPhongShadingEnabled);
+    }
+}
+
 void Renderer::render() {
     auto msFBO = sceneTarget->getMultiSampleFramebuffer();
     auto outFBO = sceneTarget->getOutputFramebuffer();

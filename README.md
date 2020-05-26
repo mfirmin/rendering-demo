@@ -14,7 +14,7 @@ TODO
   - [X] Directional Lights
   - [ ] Spotlights
 - [ ] Advanced Lighting
-  - [ ] Blinn-Phong Shading
+  - [X] Blinn-Phong Shading
   - [ ] Gamma Correction
   - [X] Emissive Lighting
   - [ ] HDR
@@ -46,6 +46,7 @@ make
 
 # Usage
 
-- `A`: Toggle AntiAliasing
-- `L`: Toggle Primary Lighting
-- `1-4`: Toggle Scene Lights
+- `A`: Toggle AntiAliasing (default on)
+- `L`: Toggle Primary Lighting (default off)
+- `1-4`: Toggle Scene Lights (default on)
+- `B`: Toggle Blinn-Phong shading on/off (default on)

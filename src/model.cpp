@@ -52,6 +52,10 @@ void Model::toggleEmissive(bool value) {
     material->toggleEmissive(value);
 }
 
+void Model::toggleBlinnPhongShading(bool value) {
+    material->toggleBlinnPhongShading(value);
+}
+
 void Model::setEmissiveColor(glm::vec3 color) {
     material->setEmissiveColor(color);
 }

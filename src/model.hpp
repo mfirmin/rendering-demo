@@ -35,6 +35,7 @@ class Model {
         void setEmissiveColor(glm::vec3 color);
         void setEmissiveStrength(float strength);
         void toggleEmissive(bool value);
+        void toggleBlinnPhongShading(bool value);
 
         void setLights(const std::vector<std::shared_ptr<Light>>& lights);
         void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);

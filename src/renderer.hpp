@@ -27,6 +27,7 @@ class Renderer {
 
         void render();
         void toggleMSAA();
+        void toggleBlinnPhongShading();
         void updateCameraRotation(glm::vec3 r);
 
         ~Renderer();
@@ -54,6 +55,7 @@ class Renderer {
         } screenObject;
 
         bool MSAAEnabled = true;
+        bool blinnPhongShadingEnabled = true;
 
         bool initializeSDL();
         bool initializeGL();

@@ -160,6 +160,8 @@ int main(int argc, char* argv[]) {
                         // Primary Lighting
                         sun->toggle();
                         sun2->toggle();
+                    } else if (key == "B") {
+                        renderer.toggleBlinnPhongShading();
                     }
                 }
             }

@@ -32,6 +32,7 @@ class Material {
         void setEmissiveStrength(float strength);
 
         void toggleEmissive(bool value);
+        void toggleBlinnPhongShading(bool value);
 
         void setModelMatrix(const glm::mat4& modelMatrix);
 

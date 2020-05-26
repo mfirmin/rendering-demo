@@ -48,6 +48,8 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
         uniform float emissiveStrength;
         uniform float emissiveEnabled;
 
+        uniform float blinnEnabled;
+
         uniform float specularCoefficient;
 
         in vec3 vNormalEyespace;
@@ -100,13 +102,19 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
                 float specularTerm = 0.0;
 
                 if (diffuseCoefficient > 0.0) {
+                    float dir = 0.0;
+                    if (blinnEnabled > 0.5f) {
+                        dir = dot(N, H);
+                    } else {
+                        dir = dot(
+                            E,
+                            reflect(-L, N)
+                        );
+                    }
                     specularTerm = pow(
                         max(
                             0.0,
-                            dot(
-                                N,
-                                H
-                            )
+                            dir
                         ),
                         shininess
                     );
@@ -155,6 +163,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
     auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
     auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
     auto emissiveEnabledLocation = glGetUniformLocation(program, "emissiveEnabled");
+    auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
@@ -164,6 +173,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
     glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
     glUniform1f(emissiveStrengthLocation, 0.0f);
     glUniform1f(emissiveEnabledLocation, 0.0f);
+    glUniform1f(blinnEnabledLocation, 1.0f);
     glUseProgram(0);
 }
 
@@ -202,6 +212,13 @@ void Material::toggleEmissive(bool value) {
     glUseProgram(program);
     auto emissiveEnabledLocation = glGetUniformLocation(program, "emissiveEnabled");
     glUniform1f(emissiveEnabledLocation, value ? 1.0f : 0.0f);
+    glUseProgram(0);
+}
+
+void Material::toggleBlinnPhongShading(bool value) {
+    glUseProgram(program);
+    auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
+    glUniform1f(blinnEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
