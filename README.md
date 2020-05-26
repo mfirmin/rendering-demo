@@ -15,9 +15,9 @@ TODO
   - [ ] Spotlights
 - [ ] Advanced Lighting
   - [X] Blinn-Phong Shading
-  - [ ] Gamma Correction
+  - [X] Gamma Correction
   - [X] Emissive Lighting
-  - [ ] HDR
+  - [X] HDR
   - [ ] Bloom
   - [ ] Deferred Shading
   - [ ] Image-Based Ambient Lighting
