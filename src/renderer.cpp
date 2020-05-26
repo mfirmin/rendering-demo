@@ -152,25 +152,48 @@ void Renderer::initializeScreenObject() {
         R"(
         #version 330
 
+        // scene is a floating point (HDR) texture
         uniform sampler2D scene;
+
+        uniform float hdrEnabled;
+        uniform float gammaCorrectionEnabled;
 
         in vec2 vUv;
 
         out vec4 fragColor;
 
         void main() {
-            vec4 color = texture(scene, vUv);
-            fragColor = color;
+            const float gamma = 2.2;
+
+            vec3 color = texture(scene, vUv).rgb;
+
+            // Reinhard Tone Mapping
+            if (hdrEnabled > 0.5) {
+                color = color / (color + vec3(1.0));
+            }
+
+            // Gamma correction
+            if (gammaCorrectionEnabled > 0.5) {
+                color = pow(color, vec3(1.0 / gamma));
+            }
+
+            fragColor = vec4(color, 1.0);
         }
         )"
     };
 
     screenObject.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 
+    glUseProgram(screenObject.program);
+    glUniform1f(glGetUniformLocation(screenObject.program, "hdrEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(screenObject.program, "gammaCorrectionEnabled"), 1.0f);
+    glUseProgram(0);
+
     if (screenObject.program == 0) {
         return;
     }
 }
+
 
 void Renderer::addModel(std::shared_ptr<Model> model) {
     model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
@@ -188,6 +211,20 @@ void Renderer::addLight(std::shared_ptr<Light> light) {
 
 void Renderer::updateCameraRotation(glm::vec3 r) {
     camera->addRotation(r);
+}
+
+void Renderer::toggleGammaCorrection() {
+    gammaCorrectionEnabled = !gammaCorrectionEnabled;
+    glUseProgram(screenObject.program);
+    glUniform1f(glGetUniformLocation(screenObject.program, "gammaCorrectionEnabled"), gammaCorrectionEnabled ? 1.0f : 0.0f);
+    glUseProgram(0);
+}
+
+void Renderer::toggleHDR() {
+    hdrEnabled = !hdrEnabled;
+    glUseProgram(screenObject.program);
+    glUniform1f(glGetUniformLocation(screenObject.program, "hdrEnabled"), hdrEnabled ? 1.0f : 0.0f);
+    glUseProgram(0);
 }
 
 void Renderer::toggleMSAA() {

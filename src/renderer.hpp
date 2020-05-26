@@ -28,6 +28,8 @@ class Renderer {
         void render();
         void toggleMSAA();
         void toggleBlinnPhongShading();
+        void toggleHDR();
+        void toggleGammaCorrection();
         void updateCameraRotation(glm::vec3 r);
 
         ~Renderer();
@@ -56,6 +58,8 @@ class Renderer {
 
         bool MSAAEnabled = true;
         bool blinnPhongShadingEnabled = true;
+        bool hdrEnabled = true;
+        bool gammaCorrectionEnabled = true;
 
         bool initializeSDL();
         bool initializeGL();

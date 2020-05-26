@@ -110,6 +110,8 @@ int main(int argc, char* argv[]) {
     auto last = std::chrono::steady_clock::now();
     bool quit = false;
 
+    int lamp1Intensity = 1;
+
     bool mouseDown = false;
     while (!quit) {
         auto now = std::chrono::steady_clock::now();
@@ -162,6 +164,13 @@ int main(int argc, char* argv[]) {
                         sun2->toggle();
                     } else if (key == "B") {
                         renderer.toggleBlinnPhongShading();
+                    } else if (key == "H") {
+                        renderer.toggleHDR();
+                    } else if (key == "G") {
+                        renderer.toggleGammaCorrection();
+                    } else if (key == "I") {
+                        lamp1Intensity = (lamp1Intensity * 2) % 31;
+                        lamp1.setIntensity(static_cast<float>(lamp1Intensity));
                     }
                 }
             }

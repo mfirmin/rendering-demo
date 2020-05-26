@@ -12,7 +12,8 @@ RenderTarget::RenderTarget(int w, int h) :
     // Initialize the color buffer for the multisample fbo
     glGenRenderbuffers(1, &colorBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_RGBA, width, height);
+    // use a floating point renderbuffer for the color
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_RGBA16F, width, height);
     // attach the color buffer to the frame buffer
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
 
@@ -42,7 +43,8 @@ RenderTarget::RenderTarget(int w, int h) :
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    // floating point texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

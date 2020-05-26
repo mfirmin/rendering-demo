@@ -50,3 +50,6 @@ make
 - `L`: Toggle Primary Lighting (default off)
 - `1-4`: Toggle Scene Lights (default on)
 - `B`: Toggle Blinn-Phong shading on/off (default on)
+- `H`: Toggle HDR (default on)
+- `G`: Toggle Gamma Correction (default on)
+- `I`: Cycle through different intensities (1, 2, 4, 8, 16) for light 1 (useful for seeing the effects of HDR)
