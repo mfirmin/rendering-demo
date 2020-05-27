@@ -1,5 +1,7 @@
 #pragma once
 
+#include "renderEffects/bloom.hpp"
+
 #include <memory>
 #include <SDL2/SDL.h>
 #include <vector>
@@ -26,6 +28,7 @@ class Renderer {
         void addLight(std::shared_ptr<Light> light);
 
         void render();
+        void toggleBloom();
         void toggleMSAA();
         void toggleBlinnPhongShading();
         void toggleHDR();
@@ -56,10 +59,13 @@ class Renderer {
             GLuint program;
         } screenObject;
 
+        BloomEffect bloomEffect;
+
         bool MSAAEnabled = true;
         bool blinnPhongShadingEnabled = true;
         bool hdrEnabled = true;
         bool gammaCorrectionEnabled = true;
+        bool bloomEnabled = true;
 
         bool initializeSDL();
         bool initializeGL();

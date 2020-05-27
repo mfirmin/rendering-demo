@@ -44,6 +44,7 @@ set(SOURCES
     src/gl/shaderUtils.cpp
     src/gl/glObject.cpp
     src/camera.cpp
+    src/renderEffects/bloom.cpp
     src/lamp.cpp
     src/light/light.cpp
     src/light/directionalLight.cpp

@@ -16,7 +16,8 @@ constexpr GLuint GL_MINOR = 3;
 Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     width(width),
     height(height),
-    camera(std::move(camera))
+    camera(std::move(camera)),
+    bloomEffect(width, height)
 {
     std::cout << "Initializing SDL...\n";
     if (!initializeSDL()) {
@@ -33,6 +34,8 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     initializeScreenObject();
 
     sceneTarget = std::make_unique<RenderTarget>(width, height);
+
+    bloomEffect.initialize(sceneTarget->getTexture());
 
     std::cout << "Ready\n";
 }
@@ -133,8 +136,7 @@ void Renderer::initializeScreenObject() {
 
     glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(GL_FLOAT), uvs.data(), GL_STATIC_DRAW);
 
-    const GLchar* vertexShaderSource[] = {
-        R"(
+    std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec2 position;
         layout(location = 1) in vec2 uv;
@@ -145,18 +147,19 @@ void Renderer::initializeScreenObject() {
             vUv = uv;
             gl_Position = vec4(position, 0.0, 1.0);
         }
-        )"
-    };
+    )";
 
-    const GLchar* fragmentShaderSource[] = {
-        R"(
+
+    std::string fragmentShaderSource = R"(
         #version 330
 
         // scene is a floating point (HDR) texture
         uniform sampler2D scene;
+        uniform sampler2D bloomBlur;
 
         uniform float hdrEnabled;
         uniform float gammaCorrectionEnabled;
+        uniform float bloomEnabled;
 
         in vec2 vUv;
 
@@ -166,6 +169,10 @@ void Renderer::initializeScreenObject() {
             const float gamma = 2.2;
 
             vec3 color = texture(scene, vUv).rgb;
+
+            if (bloomEnabled > 0.5) {
+                color += texture(bloomBlur, vUv).rgb;
+            }
 
             // Reinhard Tone Mapping
             if (hdrEnabled > 0.5) {
@@ -179,14 +186,14 @@ void Renderer::initializeScreenObject() {
 
             fragColor = vec4(color, 1.0);
         }
-        )"
-    };
+    )";
 
     screenObject.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 
     glUseProgram(screenObject.program);
     glUniform1f(glGetUniformLocation(screenObject.program, "hdrEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(screenObject.program, "gammaCorrectionEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(screenObject.program, "bloomEnabled"), 1.0f);
     glUseProgram(0);
 
     if (screenObject.program == 0) {
@@ -211,6 +218,13 @@ void Renderer::addLight(std::shared_ptr<Light> light) {
 
 void Renderer::updateCameraRotation(glm::vec3 r) {
     camera->addRotation(r);
+}
+
+void Renderer::toggleBloom() {
+    bloomEnabled = !bloomEnabled;
+    glUseProgram(screenObject.program);
+    glUniform1f(glGetUniformLocation(screenObject.program, "bloomEnabled"), bloomEnabled ? 1.0f : 0.0f);
+    glUseProgram(0);
 }
 
 void Renderer::toggleGammaCorrection() {
@@ -271,6 +285,9 @@ void Renderer::render() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFBO);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
+    // render the bloom effect
+    bloomEffect.render(screenObject.vertexArray);
+
     // Bind the screen framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -282,9 +299,13 @@ void Renderer::render() {
     glUseProgram(screenObject.program);
 
     glActiveTexture(GL_TEXTURE0);
-
     glBindTexture(GL_TEXTURE_2D, sceneTarget->getTexture());
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
+
     glUniform1i(glGetUniformLocation(screenObject.program, "scene"), 0);
+    glUniform1i(glGetUniformLocation(screenObject.program, "bloomBlur"), 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

@@ -7,11 +7,11 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <string>
 #include <sstream>
 
 Material::Material(glm::vec3 color, float specularCoefficient, float shininess) {
-    const GLchar* vertexShaderSource[] = {
-        R"(
+    std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec3 position;
         layout(location = 1) in vec3 normal;
@@ -28,11 +28,9 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
 
             gl_Position = projectionMatrix * vPositionEyespace;
         }
-        )"
-    };
+    )";
 
-    const GLchar* fragmentShaderSource[] = {
-        R"(
+    std::string fragmentShaderSource = R"(
         #version 330
 
         #define MAX_LIGHTS 10
@@ -144,8 +142,7 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
 
             fColor = vec4(illuminate(color, vPositionEyespace.xyz, N, E), 1.0);
         }
-    )"
-    };
+    )";
 
     program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 

@@ -33,7 +33,7 @@ Lamp::Lamp(
         color,
         intensity,
         0.0f,
-        0.5f
+        5.0f
     );
 
 }

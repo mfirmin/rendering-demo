@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Material> boxMaterial = std::make_unique<Material>(
         glm::vec3(0.66, 0.66, 0.66),
         0.5f,
-        4.0f
+        64.0f
     );
 
     boxMaterial->setSide(Side::BACK);
@@ -82,25 +82,26 @@ int main(int argc, char* argv[]) {
     renderer.addModel(box);
 
 
-    Lamp lamp1(sphereMesh, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.8f, 0.6f, 0.4f), 1.0f);
+    int lamp1Intensity = 2;
+    Lamp lamp1(sphereMesh, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.8f, 0.6f, 0.4f), static_cast<float>(lamp1Intensity));
     lamp1.setScale(0.1f);
 
     renderer.addModel(lamp1.getModel());
     renderer.addLight(lamp1.getLight());
 
-    Lamp lamp2(sphereMesh, glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(0.2f, 0.9f, 0.5f), 1.0f);
+    Lamp lamp2(sphereMesh, glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(0.2f, 0.9f, 0.5f), 2.0f);
     lamp2.setScale(0.1f);
 
     renderer.addModel(lamp2.getModel());
     renderer.addLight(lamp2.getLight());
 
-    Lamp lamp3(sphereMesh, glm::vec3(0.0f, 0.1f, 1.5f), glm::vec3(0.2f, 0.2f, 0.9f), 0.8f);
+    Lamp lamp3(sphereMesh, glm::vec3(0.0f, 0.1f, 1.5f), glm::vec3(0.2f, 0.2f, 0.9f), 4.0f);
     lamp3.setScale(0.2f);
 
     renderer.addModel(lamp3.getModel());
     renderer.addLight(lamp3.getLight());
 
-    Lamp lamp4(sphereMesh, glm::vec3(-1.0f, 1.5f, 1.5f), glm::vec3(0.9f, 0.2f, 0.1f), 1.0f);
+    Lamp lamp4(sphereMesh, glm::vec3(-1.0f, 1.5f, 1.5f), glm::vec3(0.9f, 0.2f, 0.1f), 4.0f);
     lamp4.setScale(0.05f);
 
     renderer.addModel(lamp4.getModel());
@@ -109,8 +110,6 @@ int main(int argc, char* argv[]) {
     float frameLength = ONE_SECOND / FPS;
     auto last = std::chrono::steady_clock::now();
     bool quit = false;
-
-    int lamp1Intensity = 1;
 
     bool mouseDown = false;
     while (!quit) {
@@ -162,7 +161,7 @@ int main(int argc, char* argv[]) {
                         // Primary Lighting
                         sun->toggle();
                         sun2->toggle();
-                    } else if (key == "B") {
+                    } else if (key == "S") {
                         renderer.toggleBlinnPhongShading();
                     } else if (key == "H") {
                         renderer.toggleHDR();
@@ -171,6 +170,8 @@ int main(int argc, char* argv[]) {
                     } else if (key == "I") {
                         lamp1Intensity = (lamp1Intensity * 2) % 31;
                         lamp1.setIntensity(static_cast<float>(lamp1Intensity));
+                    } else if (key == "B") {
+                        renderer.toggleBloom();
                     }
                 }
             }

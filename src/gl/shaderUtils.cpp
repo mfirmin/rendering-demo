@@ -3,7 +3,10 @@
 #include <iostream>
 #include <vector>
 
-GLuint ShaderUtils::compile(const GLchar* vertexShaderSource[], const GLchar* fragmentShaderSource[]) {
+GLuint ShaderUtils::compile(std::string vs, std::string fs) {
+    const GLchar* vertexShaderSource[] = { vs.c_str() };
+    const GLchar* fragmentShaderSource[] = { fs.c_str() };
+
     GLint success = 0;
 
     // Create shaders...
