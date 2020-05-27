@@ -18,7 +18,7 @@ TODO
   - [X] Gamma Correction
   - [X] Emissive Lighting
   - [X] HDR
-  - [ ] Bloom
+  - [X] Bloom
   - [ ] Deferred Shading
   - [ ] Image-Based Ambient Lighting
       - [ ] Diffuse Irradiance
