@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
     boxMaterial->setSide(Side::BACK);
 
     std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
-    // renderer.addModel(box);
+    renderer.addModel(box);
 
 
     int lamp1Intensity = 2;
