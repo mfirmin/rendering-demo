@@ -15,12 +15,14 @@
 // ctor - Takes in unique_ptr references and moves them.
 // Question: Is it better to do the std::move here, or do it when we call the
 // ctor in the first place?
-Model::Model(std::shared_ptr<Mesh> mesh, std::unique_ptr<Material>&& material) :
+Model::Model(std::shared_ptr<Mesh> m, std::unique_ptr<Material>&& mat) :
     // std::move is still required here, otherwise it would just be a copy, defeating the whole point
     // of passing mesh and material by rvalue ref in the first place
-    mesh(mesh),
-    material(std::move(material))
-{}
+    mesh(m),
+    material(std::move(mat))
+{
+    material->create();
+}
 
 Model::~Model() {}
 

@@ -74,6 +74,7 @@ int main(int argc, char* argv[]) {
     // teapot->setPosition(glm::vec3(0.0f, -0.75f, 0.0f));
 
     std::shared_ptr<Model> bunny = std::make_shared<Model>(bunnyMesh, std::move(material));
+    bunny->setPosition(glm::vec3(0.3f, -1.00f, 0.0f));
 
     renderer.addModel(bunny);
 

@@ -21,31 +21,35 @@ class Material {
         Material& operator=(const Material& other) = default;
         Material& operator=(Material&& other) = default;
 
-        void setColor(glm::vec3 color);
+        virtual void create();
 
-        void setShininess(float shininess);
+        virtual void setColor(glm::vec3 color);
 
-        void setLights(const std::vector<std::shared_ptr<Light>>& lights);
+        virtual void setShininess(float shininess);
 
-        void setEmissiveColorAndStrength(glm::vec3 color, float strength);
-        void setEmissiveColor(glm::vec3 color);
-        void setEmissiveStrength(float strength);
+        virtual void setLights(const std::vector<std::shared_ptr<Light>>& lights);
 
-        void toggleEmissive(bool value);
-        void toggleBlinnPhongShading(bool value);
+        virtual void setEmissiveColorAndStrength(glm::vec3 color, float strength);
+        virtual void setEmissiveColor(glm::vec3 color);
+        virtual void setEmissiveStrength(float strength);
 
-        void setModelMatrix(const glm::mat4& modelMatrix);
+        virtual void toggleEmissive(bool value);
+        virtual void toggleBlinnPhongShading(bool value);
 
-        void setProjectionAndViewMatrices(
+        virtual void setModelMatrix(const glm::mat4& modelMatrix);
+
+        virtual void setProjectionAndViewMatrices(
             const glm::mat4& projectionMatrix,
             const glm::mat4& viewMatrix
         );
 
-        void setMatrices(
+        virtual void setMatrices(
             const glm::mat4& projectionMatrix,
             const glm::mat4& viewMatrix,
             const glm::mat4& modelMatrix
         );
+
+        bool compile(std::string vertexShader, std::string fragmentShader);
 
         GLuint getProgram() {
             return program;
@@ -59,7 +63,11 @@ class Material {
             return side;
         }
     private:
-        GLuint program;
+        GLuint program = 0;
+
+        glm::vec3 color;
+        float specularCoefficient;
+        float shininess;
 
         Side side = Side::FRONT;
 };

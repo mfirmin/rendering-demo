@@ -22,6 +22,8 @@ Lamp::Lamp(
         8.0f
     );
 
+    material->create();
+
     material->setEmissiveColorAndStrength(color, intensity);
     material->toggleEmissive(true);
 

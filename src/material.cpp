@@ -7,10 +7,22 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <iostream>
+
 #include <string>
 #include <sstream>
 
-Material::Material(glm::vec3 color, float specularCoefficient, float shininess) {
+Material::Material(glm::vec3 color, float specularCoefficient, float shininess) :
+    color(color),
+    specularCoefficient(specularCoefficient),
+    shininess(shininess)
+{}
+
+void Material::create() {
+    if (getProgram() != 0) {
+        // already initialized
+        return;
+    }
     std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec3 position;
@@ -144,23 +156,23 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
         }
     )";
 
-    program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
-
-    if (program == 0) {
+    if (!compile(vertexShaderSource, fragmentShaderSource)) {
         return;
     }
 
-    glUseProgram(program);
-    auto projectionMatrixLocation = glGetUniformLocation(program, "projectionMatrix");
-    auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
-    auto modelMatrixLocation = glGetUniformLocation(program, "modelMatrix");
-    auto colorLocation = glGetUniformLocation(program, "color");
-    auto shininessLocation = glGetUniformLocation(program, "shininess");
-    auto specularCoefficientLocation = glGetUniformLocation(program, "specularCoefficient");
-    auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
-    auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
-    auto emissiveEnabledLocation = glGetUniformLocation(program, "emissiveEnabled");
-    auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
+    GLuint shader = getProgram();
+
+    glUseProgram(shader);
+    auto projectionMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+    auto viewMatrixLocation = glGetUniformLocation(shader, "viewMatrix");
+    auto modelMatrixLocation = glGetUniformLocation(shader, "modelMatrix");
+    auto colorLocation = glGetUniformLocation(shader, "color");
+    auto shininessLocation = glGetUniformLocation(shader, "shininess");
+    auto specularCoefficientLocation = glGetUniformLocation(shader, "specularCoefficient");
+    auto emissiveColorLocation = glGetUniformLocation(shader, "emissiveColor");
+    auto emissiveStrengthLocation = glGetUniformLocation(shader, "emissiveStrength");
+    auto emissiveEnabledLocation = glGetUniformLocation(shader, "emissiveEnabled");
+    auto blinnEnabledLocation = glGetUniformLocation(shader, "blinnEnabled");
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
@@ -175,6 +187,12 @@ Material::Material(glm::vec3 color, float specularCoefficient, float shininess) 
 }
 
 Material::~Material() {}
+
+bool Material::compile(std::string vertexShader, std::string fragmentShader) {
+    program = ShaderUtils::compile(vertexShader, fragmentShader);
+
+    return program != 0;
+}
 
 void Material::setColor(glm::vec3 color) {
     glUseProgram(program);
