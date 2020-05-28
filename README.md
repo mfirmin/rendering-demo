@@ -19,6 +19,7 @@ TODO
   - [X] Emissive Lighting
   - [X] HDR
   - [X] Bloom
+  - [ ] SSAO
   - [ ] Deferred Shading
   - [ ] Image-Based Ambient Lighting
       - [ ] Diffuse Irradiance
