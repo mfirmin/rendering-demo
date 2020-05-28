@@ -5,6 +5,7 @@
 #include "light/light.hpp"
 #include "model.hpp"
 #include "renderTarget.hpp"
+#include "deferredTarget.hpp"
 
 #include <GL/glew.h>
 
@@ -34,8 +35,9 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     initializeScreenObject();
 
     sceneTarget = std::make_unique<RenderTarget>(width, height);
+    deferredTarget = std::make_unique<DeferredTarget>(width, height);
 
-    bloomEffect.initialize(sceneTarget->getTexture());
+    bloomEffect.initialize(deferredTarget->getOutputTexture());
 
     std::cout << "Ready\n";
 }
@@ -255,6 +257,7 @@ void Renderer::toggleBlinnPhongShading() {
     for (auto model : models) {
         model->toggleBlinnPhongShading(blinnPhongShadingEnabled);
     }
+    deferredTarget->toggleBlinnPhongShading(blinnPhongShadingEnabled);
 }
 
 void Renderer::render() {
@@ -300,6 +303,69 @@ void Renderer::render() {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sceneTarget->getTexture());
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
+
+    glUniform1i(glGetUniformLocation(screenObject.program, "scene"), 0);
+    glUniform1i(glGetUniformLocation(screenObject.program, "bloomBlur"), 1);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glUseProgram(0);
+
+    // Swap
+    SDL_GL_SwapWindow(window);
+}
+
+void Renderer::renderDeferred() {
+    auto deferredBuffer = deferredTarget->getFramebuffer();
+    // Bind the scene buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, deferredBuffer);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (camera->isDirty()) {
+        for (auto& model : models) {
+            model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+        }
+        deferredTarget->setViewMatrix(camera->getViewMatrix());
+        camera->setDirty(false);
+    }
+    // TODO(mfirmin): Check if lights are dirty
+    for (auto& model : models) {
+        model->setLights(lights);
+    }
+
+    deferredTarget->setLights(lights);
+
+    // ensure models have deferred material applied
+    // todo: support multiple materials per model
+    for (auto& model : models) {
+        model->applyModelMatrix();
+        model->draw();
+    }
+
+    // do the deferred shading step
+    deferredTarget->render(screenObject.vertexArray);
+
+    // render the bloom effect
+    bloomEffect.render(screenObject.vertexArray);
+
+    // finially, render the result to the screen
+
+    // Bind the screen framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    // Clear it
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // render the screen object to it (using the scene render target)
+    glBindVertexArray(screenObject.vertexArray);
+    glUseProgram(screenObject.program);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, deferredTarget->getOutputTexture());
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());

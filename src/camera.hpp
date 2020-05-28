@@ -61,5 +61,5 @@ class Camera {
         float near;
         float far;
 
-        bool dirty = false;
+        bool dirty = true;
 };

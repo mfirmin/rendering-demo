@@ -12,6 +12,8 @@
 class Camera;
 class Light;
 class Model;
+
+class DeferredTarget;
 class RenderTarget;
 
 class Renderer {
@@ -28,6 +30,7 @@ class Renderer {
         void addLight(std::shared_ptr<Light> light);
 
         void render();
+        void renderDeferred();
         void toggleBloom();
         void toggleMSAA();
         void toggleBlinnPhongShading();
@@ -50,6 +53,7 @@ class Renderer {
         std::vector<std::shared_ptr<Light>> lights;
 
         std::unique_ptr<RenderTarget> sceneTarget;
+        std::unique_ptr<DeferredTarget> deferredTarget;
 
         struct {
             GLuint vertexArray = 0;

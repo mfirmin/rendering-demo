@@ -44,6 +44,7 @@ set(SOURCES
     src/gl/shaderUtils.cpp
     src/gl/glObject.cpp
     src/camera.cpp
+    src/deferredMaterial.cpp
     src/deferredTarget.cpp
     src/renderEffects/bloom.cpp
     src/lamp.cpp

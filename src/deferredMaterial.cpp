@@ -1,4 +1,4 @@
-#include "material.hpp"
+#include "deferredMaterial.hpp"
 
 #include "gl/shaderUtils.hpp"
 
@@ -40,9 +40,10 @@ void DeferredMaterial::create() {
     std::string fragmentShaderSource = R"(
         #version 330
 
-        (location = 0) out vec4 position;
-        (location = 1) out vec3 normal;
-        (location = 2) out vec4 albedo;
+        layout(location = 0) out vec4 position;
+        layout(location = 1) out vec3 normal;
+        layout(location = 2) out vec4 albedo;
+        layout(location = 3) out vec4 emissive;
 
         uniform mat4 viewMatrix;
 
@@ -52,10 +53,9 @@ void DeferredMaterial::create() {
         // todo: shininess?
         // uniform float shininess;
 
-        // todo include emissive
-        // uniform vec3 emissiveColor;
-        // uniform float emissiveStrength;
-        // uniform float emissiveEnabled;
+        uniform vec3 emissiveColor;
+        uniform float emissiveStrength;
+        uniform float emissiveEnabled;
 
         in vec3 vNormalEyespace;
         in vec4 vPositionEyespace;
@@ -66,10 +66,14 @@ void DeferredMaterial::create() {
             position = vPositionEyespace;
             normal = N;
             albedo = vec4(color, specularCoefficient);
+
+            if (emissiveEnabled > 0.5) {
+                emissive = vec4(emissiveColor, emissiveStrength);
+            }
         }
     )";
 
-    if (!compile(vertexShader, fragmentShader)) {
+    if (!compile(vertexShaderSource, fragmentShaderSource)) {
         return;
     }
 
@@ -88,8 +92,8 @@ void DeferredMaterial::create() {
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
-    glUniform3fv(colorLocation, 1, glm::value_ptr(color));
-    glUniform1f(specularCoefficientLocation, specularCoefficient);
+    glUniform3fv(colorLocation, 1, glm::value_ptr(getColor()));
+    glUniform1f(specularCoefficientLocation, getSpecularCoefficient());
     // glUniform1f(shininessLocation, shininess);
     // glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
     // glUniform1f(emissiveStrengthLocation, 0.0f);
@@ -98,21 +102,6 @@ void DeferredMaterial::create() {
 }
 
 DeferredMaterial::~DeferredMaterial() {}
-
-void DeferredMaterial::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
-    // do nothing
-}
-
-void DeferredMaterial::setEmissiveColor(glm::vec3 color) {
-    // do nothing
-}
-void DeferredMaterial::setEmissiveStrength(float strength) {
-    // do nothing
-}
-
-void DeferredMaterial::toggleEmissive(bool value) {
-    // do nothing
-}
 
 void DeferredMaterial::setShininess(float shininess) {
     // do nothing

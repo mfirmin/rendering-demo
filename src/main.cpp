@@ -4,6 +4,7 @@
 #include "light/directionalLight.hpp"
 #include "light/pointLight.hpp"
 #include "material.hpp"
+#include "deferredMaterial.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
 #include "renderer.hpp"
@@ -62,7 +63,7 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>();
     sphereMesh->fromOBJ("assets/sphere.obj");
 
-    std::unique_ptr<Material> material = std::make_unique<Material>(
+    std::unique_ptr<Material> material = std::make_unique<DeferredMaterial>(
         glm::vec3(0.75164, 0.60648, 0.22648),
         0.5f,
         64.0f
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
     boxMesh->fromOBJ("assets/box.obj");
 
-    std::unique_ptr<Material> boxMaterial = std::make_unique<Material>(
+    std::unique_ptr<Material> boxMaterial = std::make_unique<DeferredMaterial>(
         glm::vec3(0.66, 0.66, 0.66),
         0.5f,
         64.0f
@@ -192,7 +193,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            renderer.render();
+            renderer.renderDeferred();
             last = now;
         }
 

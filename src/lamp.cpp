@@ -3,6 +3,7 @@
 #include "light/light.hpp"
 #include "light/pointLight.hpp"
 #include "material.hpp"
+#include "deferredMaterial.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
 
@@ -16,7 +17,7 @@ Lamp::Lamp(
     glm::vec3 color,
     float intensity
 ) {
-    std::unique_ptr<Material> material = std::make_unique<Material>(
+    std::unique_ptr<Material> material = std::make_unique<DeferredMaterial>(
         color,
         0.5f,
         8.0f

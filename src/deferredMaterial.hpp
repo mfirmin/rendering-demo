@@ -19,15 +19,12 @@ class DeferredMaterial : public Material {
         DeferredMaterial& operator=(const DeferredMaterial& other) = default;
         DeferredMaterial& operator=(DeferredMaterial&& other) = default;
 
+        void create();
+
         void setShininess(float shininess);
 
         void setLights(const std::vector<std::shared_ptr<Light>>& lights);
 
-        void setEmissiveColorAndStrength(glm::vec3 color, float strength);
-        void setEmissiveColor(glm::vec3 color);
-        void setEmissiveStrength(float strength);
-
-        void toggleEmissive(bool value);
         void toggleBlinnPhongShading(bool value);
     private:
 };

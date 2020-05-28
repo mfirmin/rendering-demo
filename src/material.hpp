@@ -62,6 +62,18 @@ class Material {
         Side getSide() {
             return side;
         }
+
+        glm::vec3 getColor() {
+            return color;
+        }
+
+        float getSpecularCoefficient() {
+            return specularCoefficient;
+        }
+
+        float getShininess() {
+            return shininess;
+        }
     private:
         GLuint program = 0;
 
