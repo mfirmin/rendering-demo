@@ -22,7 +22,7 @@ class Mesh {
             return vertexArrayObject->getVertexArrayObject();
         }
 
-        uint16_t getVertexCount() {
+        uint32_t getVertexCount() {
             return vertexArrayObject->getVertexCount();
         }
     private:

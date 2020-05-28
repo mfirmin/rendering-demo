@@ -53,8 +53,11 @@ int main(int argc, char* argv[]) {
     renderer.addLight(sun);
     renderer.addLight(sun2);
 
-    std::shared_ptr<Mesh> teapotMesh = std::make_shared<Mesh>();
-    teapotMesh->fromOBJ("assets/teapot.obj");
+    // std::shared_ptr<Mesh> teapotMesh = std::make_shared<Mesh>();
+    // teapotMesh->fromOBJ("assets/teapot.obj");
+
+    std::shared_ptr<Mesh> bunnyMesh = std::make_shared<Mesh>();
+    bunnyMesh->fromOBJ("assets/bunny.obj");
 
     std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>();
     sphereMesh->fromOBJ("assets/sphere.obj");
@@ -65,12 +68,14 @@ int main(int argc, char* argv[]) {
         64.0f
     );
 
-    std::shared_ptr<Model> teapot = std::make_shared<Model>(teapotMesh, std::move(material));
-    teapot->setScale(0.1f);
-    teapot->setRotation(glm::vec3(-1.57f, 0.0f, 0.0f));
-    teapot->setPosition(glm::vec3(0.0f, -0.75f, 0.0f));
+    // std::shared_ptr<Model> teapot = std::make_shared<Model>(teapotMesh, std::move(material));
+    // teapot->setScale(0.1f);
+    // teapot->setRotation(glm::vec3(-1.57f, 0.0f, 0.0f));
+    // teapot->setPosition(glm::vec3(0.0f, -0.75f, 0.0f));
 
-    renderer.addModel(teapot);
+    std::shared_ptr<Model> bunny = std::make_shared<Model>(bunnyMesh, std::move(material));
+
+    renderer.addModel(bunny);
 
 
     std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
@@ -85,7 +90,7 @@ int main(int argc, char* argv[]) {
     boxMaterial->setSide(Side::BACK);
 
     std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
-    renderer.addModel(box);
+    // renderer.addModel(box);
 
 
     int lamp1Intensity = 2;

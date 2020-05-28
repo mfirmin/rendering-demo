@@ -24,11 +24,11 @@ class GLObject {
             return vertexArrayObject;
         }
 
-        uint16_t getVertexCount() {
+        uint32_t getVertexCount() {
             return vertexCount;
         }
     private:
-        uint16_t vertexCount = 0;
+        uint32_t vertexCount = 0;
 
         GLuint vertexArrayObject = 0;
         GLuint vertexBuffer = 0;
