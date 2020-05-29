@@ -1,4 +1,4 @@
-#include "deferredTarget.hpp"
+#include "deferredShading.hpp"
 
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
@@ -9,9 +9,12 @@
 #include <string>
 #include <sstream>
 
-DeferredTarget::DeferredTarget(int w, int h) :
+DeferredShadingEffect::DeferredShadingEffect(int w, int h) :
     width(w), height(h)
 {
+}
+
+void DeferredShadingEffect::initialize() {
     // initialize the framebuffer for the render target
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -90,7 +93,7 @@ DeferredTarget::DeferredTarget(int w, int h) :
     glDrawBuffers(4, drawbuffers.data());
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating DeferredTarget: Error creating output framebuffer\n";
+        std::cout << "Error creating DeferredShadingEffect: Error creating output framebuffer\n";
         return;
     }
 
@@ -101,11 +104,11 @@ DeferredTarget::DeferredTarget(int w, int h) :
     createProgram();
 }
 
-DeferredTarget::~DeferredTarget() {
+DeferredShadingEffect::~DeferredShadingEffect() {
     // TODO: Free buffers
 }
 
-void DeferredTarget::createOutput() {
+void DeferredShadingEffect::createOutput() {
     glGenFramebuffers(1, &outputFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
 
@@ -131,14 +134,14 @@ void DeferredTarget::createOutput() {
     glDrawBuffers(1, drawbuffers.data());
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating DeferredTarget: Error creating output framebuffer\n";
+        std::cout << "Error creating DeferredShadingEffect: Error creating output framebuffer\n";
         return;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void DeferredTarget::createDebugProgram() {
+void DeferredShadingEffect::createDebugProgram() {
     std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec2 position;
@@ -175,7 +178,7 @@ void DeferredTarget::createDebugProgram() {
     debugProgram = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 }
 
-void DeferredTarget::createProgram() {
+void DeferredShadingEffect::createProgram() {
     std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec2 position;
@@ -321,7 +324,7 @@ void DeferredTarget::createProgram() {
     glUseProgram(0);
 }
 
-void DeferredTarget::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
+void DeferredShadingEffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
     std::size_t lightIndex = 0;
 
     glUseProgram(program);
@@ -400,21 +403,21 @@ void DeferredTarget::setLights(const std::vector<std::shared_ptr<Light>>& lights
     glUseProgram(0);
 }
 
-void DeferredTarget::setViewMatrix(const glm::mat4& viewMatrix) {
+void DeferredShadingEffect::setViewMatrix(const glm::mat4& viewMatrix) {
     glUseProgram(program);
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUseProgram(0);
 }
 
-void DeferredTarget::toggleBlinnPhongShading(bool value) {
+void DeferredShadingEffect::toggleBlinnPhongShading(bool value) {
     glUseProgram(program);
     auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
     glUniform1f(blinnEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void DeferredTarget::render(GLuint vao) {
+void DeferredShadingEffect::render(GLuint vao) {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it

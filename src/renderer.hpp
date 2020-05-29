@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderEffects/bloom.hpp"
+#include "renderEffects/deferredShading.hpp"
 
 #include <memory>
 #include <SDL2/SDL.h>
@@ -13,7 +14,6 @@ class Camera;
 class Light;
 class Model;
 
-class DeferredTarget;
 class RenderTarget;
 
 class Renderer {
@@ -53,7 +53,6 @@ class Renderer {
         std::vector<std::shared_ptr<Light>> lights;
 
         std::unique_ptr<RenderTarget> sceneTarget;
-        std::unique_ptr<DeferredTarget> deferredTarget;
 
         struct {
             GLuint vertexArray = 0;
@@ -64,6 +63,7 @@ class Renderer {
         } screenObject;
 
         BloomEffect bloomEffect;
+        DeferredShadingEffect deferredShadingEffect;
 
         bool MSAAEnabled = true;
         bool blinnPhongShadingEnabled = true;

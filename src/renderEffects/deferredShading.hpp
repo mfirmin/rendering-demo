@@ -8,17 +8,19 @@
 
 class Light;
 
-class DeferredTarget {
+class DeferredShadingEffect {
     public:
-        DeferredTarget(int width, int height);
+        DeferredShadingEffect(int width, int height);
 
-        DeferredTarget(DeferredTarget&& other) = default;
-        DeferredTarget& operator=(DeferredTarget&& other) = default;
+        DeferredShadingEffect(DeferredShadingEffect&& other) = default;
+        DeferredShadingEffect& operator=(DeferredShadingEffect&& other) = default;
 
-        DeferredTarget(const DeferredTarget& other) = delete;
-        DeferredTarget& operator=(const DeferredTarget& other) = delete;
+        DeferredShadingEffect(const DeferredShadingEffect& other) = delete;
+        DeferredShadingEffect& operator=(const DeferredShadingEffect& other) = delete;
 
-        ~DeferredTarget();
+        ~DeferredShadingEffect();
+
+        void initialize();
 
         GLuint getDebugProgram() {
             return debugProgram;

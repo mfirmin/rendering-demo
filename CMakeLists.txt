@@ -45,8 +45,6 @@ set(SOURCES
     src/gl/glObject.cpp
     src/camera.cpp
     src/deferredMaterial.cpp
-    src/deferredTarget.cpp
-    src/renderEffects/bloom.cpp
     src/lamp.cpp
     src/light/light.cpp
     src/light/directionalLight.cpp
@@ -56,6 +54,8 @@ set(SOURCES
     src/mesh.cpp
     src/model.cpp
     src/renderer.cpp
+    src/renderEffects/bloom.cpp
+    src/renderEffects/deferredShading.cpp
     src/renderTarget.cpp
 )
 

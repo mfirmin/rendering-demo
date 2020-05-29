@@ -5,7 +5,6 @@
 #include "light/light.hpp"
 #include "model.hpp"
 #include "renderTarget.hpp"
-#include "deferredTarget.hpp"
 
 #include <GL/glew.h>
 
@@ -18,7 +17,8 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     width(width),
     height(height),
     camera(std::move(camera)),
-    bloomEffect(width, height)
+    bloomEffect(width, height),
+    deferredShadingEffect(width, height)
 {
     std::cout << "Initializing SDL...\n";
     if (!initializeSDL()) {
@@ -35,9 +35,9 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     initializeScreenObject();
 
     sceneTarget = std::make_unique<RenderTarget>(width, height);
-    deferredTarget = std::make_unique<DeferredTarget>(width, height);
 
-    bloomEffect.initialize(deferredTarget->getOutputTexture());
+    deferredShadingEffect.initialize();
+    bloomEffect.initialize(deferredShadingEffect.getOutputTexture());
 
     std::cout << "Ready\n";
 }
@@ -257,7 +257,7 @@ void Renderer::toggleBlinnPhongShading() {
     for (auto model : models) {
         model->toggleBlinnPhongShading(blinnPhongShadingEnabled);
     }
-    deferredTarget->toggleBlinnPhongShading(blinnPhongShadingEnabled);
+    deferredShadingEffect.toggleBlinnPhongShading(blinnPhongShadingEnabled);
 }
 
 void Renderer::render() {
@@ -319,7 +319,7 @@ void Renderer::render() {
 }
 
 void Renderer::renderDeferred() {
-    auto deferredBuffer = deferredTarget->getFramebuffer();
+    auto deferredBuffer = deferredShadingEffect.getFramebuffer();
     // Bind the scene buffer
     glBindFramebuffer(GL_FRAMEBUFFER, deferredBuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -329,7 +329,7 @@ void Renderer::renderDeferred() {
         for (auto& model : models) {
             model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
         }
-        deferredTarget->setViewMatrix(camera->getViewMatrix());
+        deferredShadingEffect.setViewMatrix(camera->getViewMatrix());
         camera->setDirty(false);
     }
     // TODO(mfirmin): Check if lights are dirty
@@ -337,7 +337,7 @@ void Renderer::renderDeferred() {
         model->setLights(lights);
     }
 
-    deferredTarget->setLights(lights);
+    deferredShadingEffect.setLights(lights);
 
     // ensure models have deferred material applied
     // todo: support multiple materials per model
@@ -347,7 +347,7 @@ void Renderer::renderDeferred() {
     }
 
     // do the deferred shading step
-    deferredTarget->render(screenObject.vertexArray);
+    deferredShadingEffect.render(screenObject.vertexArray);
 
     // render the bloom effect
     bloomEffect.render(screenObject.vertexArray);
@@ -365,7 +365,7 @@ void Renderer::renderDeferred() {
     glUseProgram(screenObject.program);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, deferredTarget->getOutputTexture());
+    glBindTexture(GL_TEXTURE_2D, deferredShadingEffect.getOutputTexture());
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
