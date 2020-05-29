@@ -18,17 +18,17 @@
 Model::Model(std::shared_ptr<Mesh> m, std::unique_ptr<Material>&& mat) :
     // std::move is still required here, otherwise it would just be a copy, defeating the whole point
     // of passing mesh and material by rvalue ref in the first place
-    mesh(m),
-    material(std::move(mat))
+    mesh(m)
 {
-    material->create();
+    mat->create();
+    materials.emplace(MaterialType::standard, std::move(mat));
 }
 
 Model::~Model() {}
 
 Model::Model(Model&& other) {
     mesh = std::move(other.mesh);
-    material = std::move(other.material);
+    materials = std::move(other.materials);
     rotation = std::move(other.rotation);
     scale = std::move(other.scale);
     position = std::move(other.position);
@@ -37,7 +37,7 @@ Model::Model(Model&& other) {
 
 Model& Model::operator=(Model&& other) {
     mesh = std::move(other.mesh);
-    material = std::move(other.material);
+    materials = std::move(other.materials);
     rotation = std::move(other.rotation);
     scale = std::move(other.scale);
     position = std::move(other.position);
@@ -46,36 +46,57 @@ Model& Model::operator=(Model&& other) {
     return *this;
 }
 
+void Model::addMaterial(MaterialType type, std::unique_ptr<Material>&& mat) {
+    mat->create();
+    materials.emplace(type, std::move(mat));
+}
+
 void Model::setColor(glm::vec3 color) {
-    material->setColor(color);
+    for (auto& m : materials) {
+        m.second->setColor(color);
+    }
 }
 
 void Model::toggleEmissive(bool value) {
-    material->toggleEmissive(value);
+    for (auto& m : materials) {
+        m.second->toggleEmissive(value);
+    }
 }
 
 void Model::toggleBlinnPhongShading(bool value) {
-    material->toggleBlinnPhongShading(value);
+    for (auto& m : materials) {
+        m.second->toggleBlinnPhongShading(value);
+    }
 }
 
 void Model::setEmissiveColor(glm::vec3 color) {
-    material->setEmissiveColor(color);
+    for (auto& m : materials) {
+        m.second->setEmissiveColor(color);
+    }
 }
 
 void Model::setEmissiveStrength(float strength) {
-    material->setEmissiveStrength(strength);
+    for (auto& m : materials) {
+        m.second->setEmissiveStrength(strength);
+    }
 }
 
 void Model::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
-    material->setEmissiveColorAndStrength(color, strength);
+    for (auto& m : materials) {
+        m.second->setEmissiveColorAndStrength(color, strength);
+    }
 }
 
 void Model::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
-    material->setLights(lights);
+    for (auto& m : materials) {
+        m.second->setLights(lights);
+    }
 }
 
 void Model::setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix) {
-    material->setProjectionAndViewMatrices(projectionMatrix, viewMatrix);
+    for (auto& m : materials) {
+        m.second->setProjectionAndViewMatrices(projectionMatrix, viewMatrix);
+    }
 }
 
 void Model::applyModelMatrix() {
@@ -88,15 +109,21 @@ void Model::applyModelMatrix() {
     modelMatrix = glm::scale(modelMatrix, scale);
     modelMatrix = modelMatrix * glm::eulerAngleYXZ(rotation.y, rotation.x, rotation.z);
 
-    material->setModelMatrix(modelMatrix);
+    for (auto& m : materials) {
+        m.second->setModelMatrix(modelMatrix);
+    }
 
     dirty = false;
 }
 
-void Model::draw() const {
-    glUseProgram(material->getProgram());
+void Model::draw(MaterialType type) const {
+    if (materials.count(type) == 0) {
+        return;
+    }
 
-    auto side = material->getSide();
+    glUseProgram(materials.at(type)->getProgram());
+
+    auto side = materials.at(type)->getSide();
 
     // TODO: Support both sides
     if (side == Side::BACK) {

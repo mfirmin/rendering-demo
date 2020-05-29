@@ -3,6 +3,7 @@
 #include "camera.hpp"
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
+#include "material.hpp"
 #include "model.hpp"
 #include "renderTarget.hpp"
 
@@ -281,7 +282,7 @@ void Renderer::render() {
 
     for (auto& model : models) {
         model->applyModelMatrix();
-        model->draw();
+        model->draw(MaterialType::standard);
     }
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, msFBO);
@@ -289,6 +290,7 @@ void Renderer::render() {
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     // render the bloom effect
+    bloomEffect.setSceneTexture(sceneTarget->getTexture());
     bloomEffect.render(screenObject.vertexArray);
 
     // Bind the screen framebuffer
@@ -343,13 +345,14 @@ void Renderer::renderDeferred() {
     // todo: support multiple materials per model
     for (auto& model : models) {
         model->applyModelMatrix();
-        model->draw();
+        model->draw(MaterialType::deferred);
     }
 
     // do the deferred shading step
     deferredShadingEffect.render(screenObject.vertexArray);
 
     // render the bloom effect
+    bloomEffect.setSceneTexture(deferredShadingEffect.getOutputTexture());
     bloomEffect.render(screenObject.vertexArray);
 
     // finially, render the result to the screen

@@ -63,7 +63,13 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Mesh> sphereMesh = std::make_shared<Mesh>();
     sphereMesh->fromOBJ("assets/sphere.obj");
 
-    std::unique_ptr<Material> material = std::make_unique<DeferredMaterial>(
+    std::unique_ptr<Material> material = std::make_unique<Material>(
+        glm::vec3(0.75164, 0.60648, 0.22648),
+        0.5f,
+        64.0f
+    );
+
+    std::unique_ptr<Material> deferredMaterial = std::make_unique<DeferredMaterial>(
         glm::vec3(0.75164, 0.60648, 0.22648),
         0.5f,
         64.0f
@@ -76,6 +82,7 @@ int main(int argc, char* argv[]) {
 
     std::shared_ptr<Model> bunny = std::make_shared<Model>(bunnyMesh, std::move(material));
     bunny->setPosition(glm::vec3(0.3f, -1.00f, 0.0f));
+    bunny->addMaterial(MaterialType::deferred, std::move(deferredMaterial));
 
     renderer.addModel(bunny);
 
@@ -83,15 +90,23 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
     boxMesh->fromOBJ("assets/box.obj");
 
-    std::unique_ptr<Material> boxMaterial = std::make_unique<DeferredMaterial>(
+    std::unique_ptr<Material> boxMaterial = std::make_unique<Material>(
+        glm::vec3(0.66, 0.66, 0.66),
+        0.5f,
+        64.0f
+    );
+
+    std::unique_ptr<Material> boxDeferredMaterial = std::make_unique<DeferredMaterial>(
         glm::vec3(0.66, 0.66, 0.66),
         0.5f,
         64.0f
     );
 
     boxMaterial->setSide(Side::BACK);
+    boxDeferredMaterial->setSide(Side::BACK);
 
     std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
+    box->addMaterial(MaterialType::deferred, std::move(boxDeferredMaterial));
     renderer.addModel(box);
 
 

@@ -2,12 +2,18 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 // Forward declare dependencies to reduce compilation-unit dependencies
 class Light;
 class Material;
 class Mesh;
+
+enum class MaterialType {
+    standard,
+    deferred
+};
 
 class Model {
     public:
@@ -39,7 +45,7 @@ class Model {
 
         void setLights(const std::vector<std::shared_ptr<Light>>& lights);
         void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
-        void draw() const;
+        void draw(MaterialType type) const;
 
         void setPosition(glm::vec3 p) {
             position = p;
@@ -62,6 +68,8 @@ class Model {
         }
 
         void applyModelMatrix();
+
+        void addMaterial(MaterialType type, std::unique_ptr<Material>&& mat);
     private:
         glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -72,5 +80,6 @@ class Model {
         // Meshes can be shared between models
         std::shared_ptr<Mesh> mesh;
         // Materials must be unique (for now?)
-        std::unique_ptr<Material> material;
+
+        std::unordered_map<MaterialType, std::unique_ptr<Material>> materials = {};
 };

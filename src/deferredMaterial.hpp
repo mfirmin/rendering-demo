@@ -19,12 +19,11 @@ class DeferredMaterial : public Material {
         DeferredMaterial& operator=(const DeferredMaterial& other) = default;
         DeferredMaterial& operator=(DeferredMaterial&& other) = default;
 
-        void create();
+        void create() override;
 
-        void setShininess(float shininess);
+        void setShininess(float shininess) override { (void)shininess; }
 
-        void setLights(const std::vector<std::shared_ptr<Light>>& lights);
-
-        void toggleBlinnPhongShading(bool value);
+        void setLights(const std::vector<std::shared_ptr<Light>>& lights) override { (void)lights; }
+        void toggleBlinnPhongShading(bool value) override { (void)value; }
     private:
 };

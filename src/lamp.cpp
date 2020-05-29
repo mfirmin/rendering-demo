@@ -17,7 +17,7 @@ Lamp::Lamp(
     glm::vec3 color,
     float intensity
 ) {
-    std::unique_ptr<Material> material = std::make_unique<DeferredMaterial>(
+    std::unique_ptr<Material> material = std::make_unique<Material>(
         color,
         0.5f,
         8.0f
@@ -28,8 +28,21 @@ Lamp::Lamp(
     material->setEmissiveColorAndStrength(color, intensity);
     material->toggleEmissive(true);
 
+    std::unique_ptr<Material> deferredMaterial = std::make_unique<DeferredMaterial>(
+        color,
+        0.5f,
+        8.0f
+    );
+
+    deferredMaterial->create();
+
+    deferredMaterial->setEmissiveColorAndStrength(color, intensity);
+    deferredMaterial->toggleEmissive(true);
+
     model = std::make_shared<Model>(mesh, std::move(material));
     model->setPosition(position);
+
+    model->addMaterial(MaterialType::deferred, std::move(deferredMaterial));
 
     light = std::make_shared<PointLight>(
         position,

@@ -10,8 +10,8 @@ class BloomEffect {
         BloomEffect(BloomEffect&& other) = default;
         BloomEffect& operator=(BloomEffect&& other) = default;
 
-        BloomEffect(const BloomEffect& other) = delete;
-        BloomEffect& operator=(const BloomEffect& other) = delete;
+        BloomEffect(const BloomEffect& other) = default;
+        BloomEffect& operator=(const BloomEffect& other) = default;
 
         ~BloomEffect();
 
@@ -35,7 +35,7 @@ class BloomEffect {
         int width;
         int height;
 
-        const int passes = 10;
+        static const int passes = 10;
 
         // input
         GLuint sceneTexture = 0;

@@ -102,16 +102,3 @@ void DeferredMaterial::create() {
 }
 
 DeferredMaterial::~DeferredMaterial() {}
-
-void DeferredMaterial::setShininess(float shininess) {
-    // do nothing
-}
-
-void DeferredMaterial::toggleBlinnPhongShading(bool value) {
-    // do nothing
-}
-
-void DeferredMaterial::setLights(const std::vector<std::shared_ptr<Light>>& lights){
-    // do nothing
-}
-
