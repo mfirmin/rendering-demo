@@ -55,7 +55,9 @@ set(SOURCES
     src/model.cpp
     src/renderer.cpp
     src/renderEffects/bloom.cpp
+    src/renderEffects/blur.cpp
     src/renderEffects/deferredShading.cpp
+    src/renderEffects/ssao.cpp
     src/renderTarget.cpp
 )
 

@@ -62,6 +62,11 @@ void DeferredMaterial::create() {
 
         void main() {
             vec3 N = normalize(vNormalEyespace);
+            vec3 E = normalize(-vPositionEyespace.xyz);
+
+            if (dot(N, E) < 0.0) {
+                N = -N;
+            }
 
             position = vPositionEyespace;
             normal = N;
@@ -85,19 +90,17 @@ void DeferredMaterial::create() {
     auto modelMatrixLocation = glGetUniformLocation(shader, "modelMatrix");
     auto colorLocation = glGetUniformLocation(shader, "color");
     auto specularCoefficientLocation = glGetUniformLocation(shader, "specularCoefficient");
-    // auto shininessLocation = glGetUniformLocation(shader, "shininess");
-    // auto emissiveColorLocation = glGetUniformLocation(shader, "emissiveColor");
-    // auto emissiveStrengthLocation = glGetUniformLocation(shader, "emissiveStrength");
-    // auto emissiveEnabledLocation = glGetUniformLocation(shader, "emissiveEnabled");
+    auto emissiveColorLocation = glGetUniformLocation(shader, "emissiveColor");
+    auto emissiveStrengthLocation = glGetUniformLocation(shader, "emissiveStrength");
+    auto emissiveEnabledLocation = glGetUniformLocation(shader, "emissiveEnabled");
     glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0)));
     glUniform3fv(colorLocation, 1, glm::value_ptr(getColor()));
     glUniform1f(specularCoefficientLocation, getSpecularCoefficient());
-    // glUniform1f(shininessLocation, shininess);
-    // glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
-    // glUniform1f(emissiveStrengthLocation, 0.0f);
-    // glUniform1f(emissiveEnabledLocation, 0.0f);
+    glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(getColor()));
+    glUniform1f(emissiveStrengthLocation, 0.0f);
+    glUniform1f(emissiveEnabledLocation, 0.0f);
     glUseProgram(0);
 }
 

@@ -202,6 +202,7 @@ void DeferredShadingEffect::createProgram() {
 
         uniform float blinnEnabled;
         uniform float emissiveEnabled;
+        uniform float ssaoEnabled;
 
         uniform int numLights;
         uniform struct Light {
@@ -221,6 +222,7 @@ void DeferredShadingEffect::createProgram() {
         uniform sampler2D gNormal;
         uniform sampler2D gAlbedo;
         uniform sampler2D gEmissive;
+        uniform sampler2D ambientOcclusion;
 
         in vec2 vUv;
 
@@ -258,7 +260,13 @@ void DeferredShadingEffect::createProgram() {
 
                 vec3 H = normalize(L + E);
 
-                vec3 ambient = light.ambientCoefficient * inColor * light.color * light.intensity;
+                float ao = 1.0;
+
+                if (ssaoEnabled > 0.5f) {
+                    ao = texture(ambientOcclusion, vUv).r;
+                }
+
+                vec3 ambient = light.ambientCoefficient * inColor * light.color * light.intensity * ao;
 
                 float diffuseCoefficient = max(0.0, dot(N, L));
                 vec3 diffuse = diffuseCoefficient * inColor * light.color * light.intensity;
@@ -280,7 +288,7 @@ void DeferredShadingEffect::createProgram() {
                             0.0,
                             dir
                         ),
-                        8.0
+                        32.0
                     );
                 }
 
@@ -320,6 +328,7 @@ void DeferredShadingEffect::createProgram() {
 
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "blinnEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(program, "ssaoEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(program, "emissiveEnabled"), 1.0f);
     glUseProgram(0);
 }
@@ -417,7 +426,14 @@ void DeferredShadingEffect::toggleBlinnPhongShading(bool value) {
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::render(GLuint vao) {
+void DeferredShadingEffect::toggleSSAO(bool value) {
+    glUseProgram(program);
+    auto ssaoEnabledLocation = glGetUniformLocation(program, "ssaoEnabled");
+    glUniform1f(ssaoEnabledLocation, value ? 1.0f : 0.0f);
+    glUseProgram(0);
+}
+
+void DeferredShadingEffect::render(GLuint vao, GLuint ambientOcclusion) {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
@@ -441,10 +457,14 @@ void DeferredShadingEffect::render(GLuint vao) {
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, emissiveTexture);
 
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, ambientOcclusion);
+
     glUniform1i(glGetUniformLocation(deferredProgram, "gPosition"), 0);
     glUniform1i(glGetUniformLocation(deferredProgram, "gNormal"), 1);
     glUniform1i(glGetUniformLocation(deferredProgram, "gAlbedo"), 2);
     glUniform1i(glGetUniformLocation(deferredProgram, "gEmissive"), 3);
+    glUniform1i(glGetUniformLocation(deferredProgram, "ambientOcclusion"), 4);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

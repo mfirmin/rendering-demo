@@ -2,6 +2,7 @@
 
 #include "renderEffects/bloom.hpp"
 #include "renderEffects/deferredShading.hpp"
+#include "renderEffects/ssao.hpp"
 
 #include <memory>
 #include <SDL2/SDL.h>
@@ -36,6 +37,7 @@ class Renderer {
         void toggleBlinnPhongShading();
         void toggleHDR();
         void toggleGammaCorrection();
+        void toggleSSAO();
         void updateCameraRotation(glm::vec3 r);
 
         ~Renderer();
@@ -64,12 +66,14 @@ class Renderer {
 
         BloomEffect bloomEffect;
         DeferredShadingEffect deferredShadingEffect;
+        SSAOEffect ssaoEffect;
 
         bool MSAAEnabled = true;
         bool blinnPhongShadingEnabled = true;
         bool hdrEnabled = true;
         bool gammaCorrectionEnabled = true;
         bool bloomEnabled = true;
+        bool ssaoEnabled = true;
 
         bool initializeSDL();
         bool initializeGL();

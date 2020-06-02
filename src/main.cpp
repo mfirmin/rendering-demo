@@ -35,14 +35,14 @@ int main(int argc, char* argv[]) {
         glm::vec3(-3.0f, 1.0f, -3.0f),
         glm::vec3(0.7f, 0.7f, 0.7f),
         1.0f,
-        0.2f
+        0.3f
     );
 
     auto sun2 = std::make_shared<DirectionalLight>(
         glm::vec3(3.0f, 3.0f, 1.0f),
         glm::vec3(0.7f, 0.7f, 0.7f),
         1.0f,
-        0.2f
+        0.3f
     );
 
     auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.0f, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 
     std::unique_ptr<Material> boxDeferredMaterial = std::make_unique<DeferredMaterial>(
         glm::vec3(0.66, 0.66, 0.66),
-        0.5f,
+        0.1f,
         64.0f
     );
 
@@ -200,6 +200,8 @@ int main(int argc, char* argv[]) {
                         lamp1.setIntensity(static_cast<float>(lamp1Intensity));
                     } else if (key == "B") {
                         renderer.toggleBloom();
+                    } else if (key == "O") {
+                        renderer.toggleSSAO();
                     }
                 }
             }

@@ -20,7 +20,7 @@ TODO
   - [X] HDR
   - [X] Bloom
   - [X] Deferred Shading
-  - [ ] SSAO
+  - [X] SSAO
 
   - [ ] Image-Based Ambient Lighting
       - [ ] Diffuse Irradiance
@@ -56,3 +56,4 @@ make
 - `G`: Toggle Gamma Correction (default on)
 - `I`: Cycle through different intensities (1, 2, 4, 8, 16) for light 1 (useful for seeing the effects of HDR)
 - `B`: Toggle Bloom on/off (default on)
+- `O`: Toggle SSAO on/off (default on) (enable primary lighting to see effects)

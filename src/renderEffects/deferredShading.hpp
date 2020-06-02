@@ -67,8 +67,9 @@ class DeferredShadingEffect {
         void toggleBlinnPhongShading(bool value);
         void toggleHDR(bool value);
         void toggleGammaCorrection(bool value);
+        void toggleSSAO(bool value);
 
-        void render(GLuint vao);
+        void render(GLuint vao, GLuint ambientOcclusion);
     private:
         int width;
         int height;

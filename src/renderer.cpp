@@ -19,7 +19,8 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     height(height),
     camera(std::move(camera)),
     bloomEffect(width, height),
-    deferredShadingEffect(width, height)
+    deferredShadingEffect(width, height),
+    ssaoEffect(width, height)
 {
     std::cout << "Initializing SDL...\n";
     if (!initializeSDL()) {
@@ -38,6 +39,7 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     sceneTarget = std::make_unique<RenderTarget>(width, height);
 
     deferredShadingEffect.initialize();
+    ssaoEffect.initialize();
     bloomEffect.initialize(deferredShadingEffect.getOutputTexture());
 
     std::cout << "Ready\n";
@@ -261,6 +263,11 @@ void Renderer::toggleBlinnPhongShading() {
     deferredShadingEffect.toggleBlinnPhongShading(blinnPhongShadingEnabled);
 }
 
+void Renderer::toggleSSAO() {
+    ssaoEnabled = !ssaoEnabled;
+    deferredShadingEffect.toggleSSAO(ssaoEnabled);
+}
+
 void Renderer::render() {
     auto msFBO = sceneTarget->getMultiSampleFramebuffer();
     auto outFBO = sceneTarget->getOutputFramebuffer();
@@ -332,6 +339,7 @@ void Renderer::renderDeferred() {
             model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
         }
         deferredShadingEffect.setViewMatrix(camera->getViewMatrix());
+        ssaoEffect.setProjectionMatrix(camera->getProjectionMatrix());
         camera->setDirty(false);
     }
     // TODO(mfirmin): Check if lights are dirty
@@ -348,12 +356,15 @@ void Renderer::renderDeferred() {
         model->draw(MaterialType::deferred);
     }
 
-    // do the deferred shading step
-    deferredShadingEffect.render(screenObject.vertexArray);
+    // render the ambient occlusion term
+    ssaoEffect.render(screenObject.vertexArray, deferredShadingEffect.getPosition(), deferredShadingEffect.getNormal());
 
     // render the bloom effect
     bloomEffect.setSceneTexture(deferredShadingEffect.getOutputTexture());
     bloomEffect.render(screenObject.vertexArray);
+
+    // do the deferred lighting step
+    deferredShadingEffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
 
     // finially, render the result to the screen
 
@@ -369,7 +380,6 @@ void Renderer::renderDeferred() {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, deferredShadingEffect.getOutputTexture());
-
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
 
