@@ -48,7 +48,7 @@ Lamp::Lamp(
         position,
         color,
         intensity,
-        0.0f,
+        0.01f,
         5.0f
     );
 
