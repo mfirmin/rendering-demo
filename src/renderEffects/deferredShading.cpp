@@ -93,7 +93,7 @@ void DeferredShadingEffect::initialize() {
     glDrawBuffers(4, drawbuffers.data());
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating DeferredShadingEffect: Error creating output framebuffer\n";
+        std::cout << "Error creating DeferredShadingEffect: Error creating framebuffer\n";
         return;
     }
 

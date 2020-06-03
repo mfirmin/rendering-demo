@@ -2,6 +2,7 @@
 
 #include "renderEffects/bloom.hpp"
 #include "renderEffects/deferredShading.hpp"
+#include "renderEffects/fxaa.hpp"
 #include "renderEffects/ssao.hpp"
 
 #include <memory>
@@ -60,15 +61,22 @@ class Renderer {
             GLuint vertexArray = 0;
             GLuint vertexBuffer = 0;
             GLuint uvBuffer = 0;
-
-            GLuint program;
         } screenObject;
+
+        struct {
+            GLuint fbo = 0;
+            GLuint result = 0;
+
+            GLuint program = 0;
+        } compositingPass;
 
         BloomEffect bloomEffect;
         DeferredShadingEffect deferredShadingEffect;
         SSAOEffect ssaoEffect;
+        FXAAEffect fxaaEffect;
 
-        bool MSAAEnabled = true;
+        bool FXAAEnabled = true;
+        bool MSAAEnabled = false;
         bool blinnPhongShadingEnabled = true;
         bool hdrEnabled = true;
         bool gammaCorrectionEnabled = true;
@@ -79,4 +87,5 @@ class Renderer {
         bool initializeGL();
 
         void initializeScreenObject();
+        void initializeCompositingPass();
 };

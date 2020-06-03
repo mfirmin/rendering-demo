@@ -35,7 +35,7 @@ void BlurEffect::createGLObjects() {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating BloomEffect: Error creating multisample framebuffer\n";
+        std::cout << "Error creating Blur: Error creating framebuffer\n";
         return;
     }
 

@@ -44,7 +44,7 @@ void SSAOEffect::createGLObjects() {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ambientOcclusionTexture, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating BloomEffect: Error creating multisample framebuffer\n";
+        std::cout << "Error creating SSAO: Error creating framebuffer\n";
         return;
     }
 

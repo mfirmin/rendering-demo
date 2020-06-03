@@ -46,7 +46,7 @@ void BloomEffect::initializeBrightnessBuffers() {
     glDrawBuffers(1, drawbuffers.data());
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating BloomEffect: Error creating multisample framebuffer\n";
+        std::cout << "Error creating BloomEffect: Error creating framebuffer\n";
         return;
     }
 

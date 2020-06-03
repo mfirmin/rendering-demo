@@ -20,7 +20,8 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     camera(std::move(camera)),
     bloomEffect(width, height),
     deferredShadingEffect(width, height),
-    ssaoEffect(width, height)
+    ssaoEffect(width, height),
+    fxaaEffect(width, height)
 {
     std::cout << "Initializing SDL...\n";
     if (!initializeSDL()) {
@@ -41,6 +42,11 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     deferredShadingEffect.initialize();
     ssaoEffect.initialize();
     bloomEffect.initialize(deferredShadingEffect.getOutputTexture());
+    fxaaEffect.initialize();
+
+    // composits bloom, hdr, and gammaCorrection
+    // Final step before passing to fxaa
+    initializeCompositingPass();
 
     std::cout << "Ready\n";
 }
@@ -63,6 +69,7 @@ bool Renderer::initializeSDL() {
             screen = SDL_GetWindowSurface(window);
         }
     }
+
     return true;
 }
 
@@ -80,14 +87,12 @@ bool Renderer::initializeGL() {
 
     glewExperimental = GL_TRUE;
     GLenum glewError = glewInit();
-    if (glewError != GLEW_OK)
-    {
+    if (glewError != GLEW_OK) {
         std::cout << "Error initializing GLEW\n";
         return false;
     }
 
-    if (SDL_GL_SetSwapInterval(1) < 0)
-    {
+    if (SDL_GL_SetSwapInterval(1) < 0) {
         std::cout << "Unable to set VSync\n";
         return false;
     }
@@ -140,7 +145,31 @@ void Renderer::initializeScreenObject() {
     };
 
     glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(GL_FLOAT), uvs.data(), GL_STATIC_DRAW);
+}
 
+void Renderer::initializeCompositingPass() {
+    glGenFramebuffers(1, &compositingPass.fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, compositingPass.fbo);
+
+    glGenTextures(1, &compositingPass.result);
+    glBindTexture(GL_TEXTURE_2D, compositingPass.result);
+    // just need red component (greyscale)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, compositingPass.result, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "Error creating FXAA: Error creating framebuffer\n";
+        return;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    // Create Compositing Shader
     std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec2 position;
@@ -193,17 +222,13 @@ void Renderer::initializeScreenObject() {
         }
     )";
 
-    screenObject.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
+    compositingPass.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 
-    glUseProgram(screenObject.program);
-    glUniform1f(glGetUniformLocation(screenObject.program, "hdrEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(screenObject.program, "gammaCorrectionEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(screenObject.program, "bloomEnabled"), 1.0f);
+    glUseProgram(compositingPass.program);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), 1.0f);
     glUseProgram(0);
-
-    if (screenObject.program == 0) {
-        return;
-    }
 }
 
 
@@ -227,22 +252,22 @@ void Renderer::updateCameraRotation(glm::vec3 r) {
 
 void Renderer::toggleBloom() {
     bloomEnabled = !bloomEnabled;
-    glUseProgram(screenObject.program);
-    glUniform1f(glGetUniformLocation(screenObject.program, "bloomEnabled"), bloomEnabled ? 1.0f : 0.0f);
+    glUseProgram(compositingPass.program);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), bloomEnabled ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
 void Renderer::toggleGammaCorrection() {
     gammaCorrectionEnabled = !gammaCorrectionEnabled;
-    glUseProgram(screenObject.program);
-    glUniform1f(glGetUniformLocation(screenObject.program, "gammaCorrectionEnabled"), gammaCorrectionEnabled ? 1.0f : 0.0f);
+    glUseProgram(compositingPass.program);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), gammaCorrectionEnabled ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
 void Renderer::toggleHDR() {
     hdrEnabled = !hdrEnabled;
-    glUseProgram(screenObject.program);
-    glUniform1f(glGetUniformLocation(screenObject.program, "hdrEnabled"), hdrEnabled ? 1.0f : 0.0f);
+    glUseProgram(compositingPass.program);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), hdrEnabled ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
@@ -308,7 +333,7 @@ void Renderer::render() {
 
     // render the screen object to it (using the scene render target)
     glBindVertexArray(screenObject.vertexArray);
-    glUseProgram(screenObject.program);
+    glUseProgram(compositingPass.program);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sceneTarget->getTexture());
@@ -316,8 +341,8 @@ void Renderer::render() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
 
-    glUniform1i(glGetUniformLocation(screenObject.program, "scene"), 0);
-    glUniform1i(glGetUniformLocation(screenObject.program, "bloomBlur"), 1);
+    glUniform1i(glGetUniformLocation(compositingPass.program, "scene"), 0);
+    glUniform1i(glGetUniformLocation(compositingPass.program, "bloomBlur"), 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -366,29 +391,32 @@ void Renderer::renderDeferred() {
     // do the deferred lighting step
     deferredShadingEffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
 
-    // finially, render the result to the screen
-
+    // Render the compositing pass
     // Bind the screen framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, compositingPass.fbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render the screen object to it (using the scene render target)
     glBindVertexArray(screenObject.vertexArray);
-    glUseProgram(screenObject.program);
+    glUseProgram(compositingPass.program);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, deferredShadingEffect.getOutputTexture());
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
 
-    glUniform1i(glGetUniformLocation(screenObject.program, "scene"), 0);
-    glUniform1i(glGetUniformLocation(screenObject.program, "bloomBlur"), 1);
+    glUniform1i(glGetUniformLocation(compositingPass.program, "scene"), 0);
+    glUniform1i(glGetUniformLocation(compositingPass.program, "bloomBlur"), 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glUseProgram(0);
+
+
+    // perform anti-aliasing pass (fxaa) which is rendered to the screen
+    fxaaEffect.render(screenObject.vertexArray, compositingPass.result);
 
     // Swap
     SDL_GL_SwapWindow(window);
