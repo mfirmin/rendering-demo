@@ -196,6 +196,8 @@ void Renderer::initializeCompositingPass() {
         uniform float gammaCorrectionEnabled;
         uniform float bloomEnabled;
 
+        uniform float exposure;
+
         in vec2 vUv;
 
         out vec4 fragColor;
@@ -211,7 +213,8 @@ void Renderer::initializeCompositingPass() {
 
             // Reinhard Tone Mapping
             if (hdrEnabled > 0.5) {
-                color = color / (color + vec3(1.0));
+                // color = color / (color + vec3(1.0));
+                color = vec3(1.0) - exp(-color * exposure);
             }
 
             // Gamma correction
@@ -229,6 +232,7 @@ void Renderer::initializeCompositingPass() {
     glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "exposure"), 1.0f);
     glUseProgram(0);
 }
 
@@ -330,6 +334,12 @@ void Renderer::toggleBlinnPhongShading() {
 void Renderer::toggleSSAO() {
     ssaoEnabled = !ssaoEnabled;
     deferredShadingEffect.toggleSSAO(ssaoEnabled);
+}
+
+void Renderer::setExposure(float value) {
+    glUseProgram(compositingPass.program);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "exposure"), value);
+    glUseProgram(0);
 }
 
 void Renderer::render() {

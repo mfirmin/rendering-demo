@@ -42,6 +42,8 @@ class Renderer {
         void toggleSSAO();
         void updateCameraRotation(glm::vec3 r);
 
+        void setExposure(float value);
+
         ~Renderer();
     private:
         SDL_Window* window = nullptr;

@@ -139,6 +139,18 @@ int main(int argc, char* argv[]) {
     auto last = std::chrono::steady_clock::now();
     bool quit = false;
 
+    std::vector<float> exposureValues = {
+        0.1f,
+        0.2f,
+        0.5f,
+        1.0f,
+        2.0f,
+        5.0f,
+        10.0f
+    };
+
+    unsigned int currentExposure = 4;
+
     bool mouseDown = false;
     while (!quit) {
         auto now = std::chrono::steady_clock::now();
@@ -203,6 +215,13 @@ int main(int argc, char* argv[]) {
                         renderer.toggleBloom();
                     } else if (key == "O") {
                         renderer.toggleSSAO();
+                    } else if (key == "E") {
+                        currentExposure++;
+                        if (currentExposure >= exposureValues.size()) {
+                            currentExposure = 0;
+                        }
+
+                        renderer.setExposure(exposureValues.at(currentExposure));
                     }
                 }
             }

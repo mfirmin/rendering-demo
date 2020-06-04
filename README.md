@@ -52,6 +52,7 @@ make
 - `1-4`: Toggle Scene Lights (default on)
 - `S`: Toggle Blinn-Phong shading on/off (default on)
 - `H`: Toggle HDR (default on)
+- `E`: Cycle through Exposure values (0.1, 0.2, 0.4, 0.8, 1.0, 2.0, 5.0, 10.0) (default = 1.0)
 - `G`: Toggle Gamma Correction (default on)
 - `I`: Cycle through different intensities (1, 2, 4, 8, 16) for light 1 (useful for seeing the effects of HDR)
 - `B`: Toggle Bloom on/off (default on)
