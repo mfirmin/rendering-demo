@@ -9,7 +9,7 @@ TODO
 - [X] Antialiasing
   - [X] MSAA (Directly supported by OpenGL)
   - [X] MSAA for secondary framebuffers with texture attachments
-  - [ ] FXAA (or SMAA) (as MSAA is not (performantly) compatible with Deferred Shading)
+  - [X] FXAA (or SMAA) (as MSAA is not (performantly) compatible with Deferred Shading)
 - [X] Basic Lighting
   - [X] Point Lights
   - [X] Directional Lights
@@ -21,7 +21,6 @@ TODO
   - [X] Bloom
   - [X] Deferred Shading
   - [X] SSAO
-
   - [ ] Image-Based Ambient Lighting
       - [ ] Diffuse Irradiance
       - [ ] Specular
