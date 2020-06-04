@@ -177,6 +177,7 @@ int main(int argc, char* argv[]) {
                     auto key = std::string(SDL_GetKeyName(e.key.keysym.sym));
                     if (key == "A") {
                         renderer.toggleMSAA();
+                        renderer.toggleFXAA();
                     } else if (key == "1") {
                         lamp1.toggle();
                     } else if (key == "2") {

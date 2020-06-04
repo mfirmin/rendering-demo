@@ -47,6 +47,7 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     // composits bloom, hdr, and gammaCorrection
     // Final step before passing to fxaa
     initializeCompositingPass();
+    initializeBaseProgram();
 
     std::cout << "Ready\n";
 }
@@ -231,6 +232,40 @@ void Renderer::initializeCompositingPass() {
     glUseProgram(0);
 }
 
+void Renderer::initializeBaseProgram() {
+    // Create Basic Shader (render texture to screen)
+    std::string vertexShaderSource = R"(
+        #version 330
+        layout(location = 0) in vec2 position;
+        layout(location = 1) in vec2 uv;
+
+        out vec2 vUv;
+
+        void main() {
+            vUv = uv;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    )";
+
+
+    std::string fragmentShaderSource = R"(
+        #version 330
+
+        uniform sampler2D scene;
+
+        in vec2 vUv;
+
+        out vec4 fragColor;
+
+        void main() {
+            vec3 color = texture(scene, vUv).rgb;
+            fragColor = vec4(color, 1.0);
+        }
+    )";
+
+    baseProgram = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
+}
+
 
 void Renderer::addModel(std::shared_ptr<Model> model) {
     model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
@@ -278,6 +313,10 @@ void Renderer::toggleMSAA() {
         glEnable(GL_MULTISAMPLE);
     }
     MSAAEnabled = !MSAAEnabled;
+}
+
+void Renderer::toggleFXAA() {
+    FXAAEnabled = !FXAAEnabled;
 }
 
 void Renderer::toggleBlinnPhongShading() {
@@ -415,8 +454,23 @@ void Renderer::renderDeferred() {
     glUseProgram(0);
 
 
-    // perform anti-aliasing pass (fxaa) which is rendered to the screen
-    fxaaEffect.render(screenObject.vertexArray, compositingPass.result);
+    if (FXAAEnabled) {
+        // perform anti-aliasing pass (fxaa) which is rendered to the screen
+        fxaaEffect.render(screenObject.vertexArray, compositingPass.result);
+    } else {
+        // render scene to screen without aa
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindVertexArray(screenObject.vertexArray);
+        glUseProgram(baseProgram);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, compositingPass.result);
+        glUniform1i(glGetUniformLocation(baseProgram, "scene"), 0);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glUseProgram(0);
+    }
 
     // Swap
     SDL_GL_SwapWindow(window);

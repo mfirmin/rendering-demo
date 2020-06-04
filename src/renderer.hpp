@@ -35,6 +35,7 @@ class Renderer {
         void renderDeferred();
         void toggleBloom();
         void toggleMSAA();
+        void toggleFXAA();
         void toggleBlinnPhongShading();
         void toggleHDR();
         void toggleGammaCorrection();
@@ -70,6 +71,8 @@ class Renderer {
             GLuint program = 0;
         } compositingPass;
 
+        GLuint baseProgram = 0;
+
         BloomEffect bloomEffect;
         DeferredShadingEffect deferredShadingEffect;
         SSAOEffect ssaoEffect;
@@ -88,4 +91,5 @@ class Renderer {
 
         void initializeScreenObject();
         void initializeCompositingPass();
+        void initializeBaseProgram();
 };
