@@ -33,16 +33,16 @@ int main(int argc, char* argv[]) {
 
     auto sun = std::make_shared<DirectionalLight>(
         glm::vec3(-3.0f, 1.0f, -3.0f),
-        glm::vec3(0.7f, 0.7f, 0.7f),
-        1.0f,
-        0.3f
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        0.5f,
+        0.2f
     );
 
     auto sun2 = std::make_shared<DirectionalLight>(
         glm::vec3(3.0f, 3.0f, 1.0f),
-        glm::vec3(0.7f, 0.7f, 0.7f),
-        1.0f,
-        0.3f
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        0.5f,
+        0.2f
     );
 
     auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.0f, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -70,8 +70,9 @@ int main(int argc, char* argv[]) {
     );
 
     std::unique_ptr<Material> deferredMaterial = std::make_unique<DeferredMaterial>(
-        glm::vec3(0.75164, 0.60648, 0.22648),
-        0.5f,
+        // glm::vec3(0.75164, 0.60648, 0.22648),
+        glm::vec3(0.4, 0.5, 0.5),
+        1.0f,
         64.0f
     );
 

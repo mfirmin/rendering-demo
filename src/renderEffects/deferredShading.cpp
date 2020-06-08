@@ -292,7 +292,12 @@ void DeferredShadingEffect::createProgram() {
                     );
                 }
 
-                vec3 specular = specularCoefficient * specularTerm * inColor * light.color * light.intensity;
+                // Specular color can (and should) be a different color than diffuse
+                // this is because it often represents a top glossy layer over the actual paint of the object.
+
+                vec3 specularColor = vec3(1.0, 1.0, 1.0);
+
+                vec3 specular = specularCoefficient * specularTerm * specularColor * light.color * light.intensity;
 
                 // TODO: Shadows
 
