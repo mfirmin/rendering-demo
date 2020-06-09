@@ -39,6 +39,9 @@ class Model {
 
         void setColor(glm::vec3 color);
         void setEmissiveColorAndStrength(glm::vec3 color, float strength);
+        void setMetalness(float metalness);
+        void setRoughness(float roughness);
+
         void setEmissiveColor(glm::vec3 color);
         void setEmissiveStrength(float strength);
         void toggleEmissive(bool value);

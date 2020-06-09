@@ -15,6 +15,13 @@
 #include <memory>
 #include <stdlib.h>
 
+enum class PBRPreset {
+    metallic, // metal = 1, roughness = 0
+    glossy, // metal = 0, roughness = 0
+    rough, // metal = 0, roughness = 1
+    rough_metal // metal = 1, roughness = 1
+};
+
 constexpr float ONE_SECOND = 1000.0f;
 constexpr float FPS = 60.0f;
 
@@ -114,7 +121,7 @@ int main(int argc, char* argv[]) {
 
     std::unique_ptr<Material> boxPBRMaterial = std::make_unique<DeferredPBRMaterial>(
         glm::vec3(0.66, 0.66, 0.66),
-        0.0f,
+        1.0f,
         0.0f
     );
 
@@ -174,7 +181,9 @@ int main(int argc, char* argv[]) {
 
     sun->toggle();
     sun2->toggle();
-    unsigned int currentExposure = 4;
+    unsigned int currentExposure = 3;
+
+    PBRPreset pbrMaterialType = PBRPreset::metallic;
 
     bool mouseDown = false;
     while (!quit) {
@@ -249,6 +258,24 @@ int main(int argc, char* argv[]) {
                         renderer.setExposure(exposureValues.at(currentExposure));
                     } else if (key == "P") {
                         renderer.togglePBR();
+                    } else if (key == "M") {
+                        if (pbrMaterialType == PBRPreset::metallic) {
+                            pbrMaterialType = PBRPreset::glossy;
+                            bunny->setRoughness(0.0);
+                            bunny->setMetalness(0.0);
+                        } else if (pbrMaterialType == PBRPreset::glossy){
+                            pbrMaterialType = PBRPreset::rough;
+                            bunny->setRoughness(1.0);
+                            bunny->setMetalness(0.0);
+                        } else if (pbrMaterialType == PBRPreset::rough) {
+                            pbrMaterialType = PBRPreset::rough_metal;
+                            bunny->setRoughness(0.6);
+                            bunny->setMetalness(1.0);
+                        } else if (pbrMaterialType == PBRPreset::rough_metal) {
+                            pbrMaterialType = PBRPreset::metallic;
+                            bunny->setRoughness(0.2);
+                            bunny->setMetalness(1.0);
+                        }
                     }
                 }
             }

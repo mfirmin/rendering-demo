@@ -57,6 +57,18 @@ void Model::setColor(glm::vec3 color) {
     }
 }
 
+void Model::setMetalness(float metalness) {
+    for (auto& m : materials) {
+        m.second->setMetalness(metalness);
+    }
+}
+
+void Model::setRoughness(float roughness) {
+    for (auto& m : materials) {
+        m.second->setRoughness(roughness);
+    }
+}
+
 void Model::toggleEmissive(bool value) {
     for (auto& m : materials) {
         m.second->toggleEmissive(value);

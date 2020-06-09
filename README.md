@@ -58,3 +58,5 @@ make
 - `I`: Cycle through different intensities (1, 2, 4, 8, 16) for light 1 (useful for seeing the effects of HDR)
 - `B`: Toggle Bloom on/off (default on)
 - `O`: Toggle SSAO on/off (default on) (enable primary lighting to see effects)
+- `P`: Toggle PBR on/off
+- `M`: Cycle through PBR materials for model (metallic, glossy, rough, rough metal) (default: metallic)

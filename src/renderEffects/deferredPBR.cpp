@@ -393,7 +393,7 @@ void DeferredPBREffect::createProgram() {
                 N = -N;
             }
 
-            vec3 color = illuminate(albedo, emissive, position, N, V, max(mr.r, 0.001), mr.g);
+            vec3 color = illuminate(albedo, emissive, position, N, V, max(mr.r, 0.01), mr.g);
 
             fragColor = vec4(color, 1.0);
         }
