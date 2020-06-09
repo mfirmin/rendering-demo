@@ -21,6 +21,7 @@ TODO
   - [X] Bloom
   - [X] Deferred Shading
   - [X] SSAO
+  - [X] PBR
   - [ ] Image-Based Ambient Lighting
       - [ ] Diffuse Irradiance
       - [ ] Specular
