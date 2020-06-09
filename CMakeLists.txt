@@ -44,18 +44,20 @@ set(SOURCES
     src/gl/shaderUtils.cpp
     src/gl/glObject.cpp
     src/camera.cpp
-    src/deferredMaterial.cpp
     src/lamp.cpp
     src/light/light.cpp
     src/light/directionalLight.cpp
     src/light/pointLight.cpp
     src/light/spotLight.cpp
-    src/material.cpp
+    src/material/deferredMaterial.cpp
+    src/material/deferredPBR.cpp
+    src/material/material.cpp
     src/mesh.cpp
     src/model.cpp
     src/renderer.cpp
     src/renderEffects/bloom.cpp
     src/renderEffects/blur.cpp
+    src/renderEffects/deferredPBR.cpp
     src/renderEffects/deferredShading.cpp
     src/renderEffects/fxaa.cpp
     src/renderEffects/ssao.cpp

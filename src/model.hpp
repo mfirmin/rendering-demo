@@ -12,7 +12,8 @@ class Mesh;
 
 enum class MaterialType {
     standard,
-    deferred
+    deferred,
+    deferred_pbr
 };
 
 class Model {

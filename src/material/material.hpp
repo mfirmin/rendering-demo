@@ -38,6 +38,9 @@ class Material {
 
         virtual void setModelMatrix(const glm::mat4& modelMatrix);
 
+        virtual void setMetalness(float metalness) { (void)metalness; }
+        virtual void setRoughness(float roughness) { (void)roughness; }
+
         virtual void setProjectionAndViewMatrices(
             const glm::mat4& projectionMatrix,
             const glm::mat4& viewMatrix

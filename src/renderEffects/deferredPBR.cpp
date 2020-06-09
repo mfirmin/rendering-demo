@@ -1,4 +1,4 @@
-#include "deferredShading.hpp"
+#include "deferredPBR.hpp"
 
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
@@ -9,15 +9,17 @@
 #include <string>
 #include <sstream>
 
-DeferredShadingEffect::DeferredShadingEffect(int w, int h) :
+DeferredPBREffect::DeferredPBREffect(int w, int h) :
     width(w), height(h)
 {
 }
 
-void DeferredShadingEffect::initialize() {
+void DeferredPBREffect::initialize() {
     // initialize the framebuffer for the render target
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    /** Position Texture **/
 
     // initialize the texture to bind to the buffer
     glGenTextures(1, &positionTexture);
@@ -35,6 +37,8 @@ void DeferredShadingEffect::initialize() {
     // attach the texture to the framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, positionTexture, 0);
 
+    /** Normal Texture **/
+
     glGenTextures(1, &normalTexture);
     glBindTexture(GL_TEXTURE_2D, normalTexture);
 
@@ -49,6 +53,8 @@ void DeferredShadingEffect::initialize() {
 
     // attach the texture to the framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normalTexture, 0);
+
+    /** Albedo Texture **/
 
     glGenTextures(1, &albedoTexture);
     glBindTexture(GL_TEXTURE_2D, albedoTexture);
@@ -65,6 +71,8 @@ void DeferredShadingEffect::initialize() {
     // attach the texture to the framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, albedoTexture, 0);
 
+    /** Emissive Texture **/
+
     glGenTextures(1, &emissiveTexture);
     glBindTexture(GL_TEXTURE_2D, emissiveTexture);
 
@@ -80,6 +88,24 @@ void DeferredShadingEffect::initialize() {
     // attach the texture to the framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, emissiveTexture, 0);
 
+    /** Roughness And Metalness Texture **/
+
+    glGenTextures(1, &roughnessAndMetalnessTexture);
+    glBindTexture(GL_TEXTURE_2D, roughnessAndMetalnessTexture);
+
+    // floating point texture, R for roughness, G for metalness
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, width, height, 0, GL_RG, GL_FLOAT, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // attach the texture to the framebuffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, roughnessAndMetalnessTexture, 0);
+
+
     // initialize the depth buffer
     glGenRenderbuffers(1, &depthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
@@ -87,13 +113,13 @@ void DeferredShadingEffect::initialize() {
     // attach the depth buffer to the frame buffer
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
-    std::array<GLenum, 4> drawbuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+    std::array<GLenum, 5> drawbuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
 
 
-    glDrawBuffers(4, drawbuffers.data());
+    glDrawBuffers(5, drawbuffers.data());
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating DeferredShadingEffect: Error creating framebuffer\n";
+        std::cout << "Error creating DeferredPBREffect: Error creating framebuffer\n";
         return;
     }
 
@@ -104,11 +130,11 @@ void DeferredShadingEffect::initialize() {
     createProgram();
 }
 
-DeferredShadingEffect::~DeferredShadingEffect() {
+DeferredPBREffect::~DeferredPBREffect() {
     // TODO: Free buffers
 }
 
-void DeferredShadingEffect::createOutput() {
+void DeferredPBREffect::createOutput() {
     glGenFramebuffers(1, &outputFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
 
@@ -134,14 +160,14 @@ void DeferredShadingEffect::createOutput() {
     glDrawBuffers(1, drawbuffers.data());
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Error creating DeferredShadingEffect: Error creating output framebuffer\n";
+        std::cout << "Error creating DeferredPBREffect: Error creating output framebuffer\n";
         return;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void DeferredShadingEffect::createDebugProgram() {
+void DeferredPBREffect::createDebugProgram() {
     std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec2 position;
@@ -169,8 +195,6 @@ void DeferredShadingEffect::createDebugProgram() {
         void main() {
             vec3 color = texture(input, vUv).rgb;
 
-            color = color + vec3(1.0) * 0.5;
-
             fragColor = vec4(color, 1.0);
         }
     )";
@@ -178,7 +202,7 @@ void DeferredShadingEffect::createDebugProgram() {
     debugProgram = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 }
 
-void DeferredShadingEffect::createProgram() {
+void DeferredPBREffect::createProgram() {
     std::string vertexShaderSource = R"(
         #version 330
         layout(location = 0) in vec2 position;
@@ -197,10 +221,10 @@ void DeferredShadingEffect::createProgram() {
         #version 330
 
         #define MAX_LIGHTS 10
+        #define PI 3.1415926535
 
         uniform mat4 viewMatrix;
 
-        uniform float blinnEnabled;
         uniform float emissiveEnabled;
         uniform float ssaoEnabled;
 
@@ -222,18 +246,91 @@ void DeferredShadingEffect::createProgram() {
         uniform sampler2D gNormal;
         uniform sampler2D gAlbedo;
         uniform sampler2D gEmissive;
+        uniform sampler2D gRoughnessAndMetalness;
         uniform sampler2D ambientOcclusion;
 
         in vec2 vUv;
 
         out vec4 fragColor;
 
-        vec3 illuminate(vec4 albedo, vec4 emissive, vec3 P, vec3 N, vec3 E) {
+        // Trwobridge-Reitz GGX Normal Distribution Function
+        //
+        // Determines the ratio of microfacets that are aligned
+        // to the Halfway vector using the provided roughness value
+        float NDF(vec3 N, vec3 H, float r) {
+            float nDotH = max(dot(N, H), 0.0);
+            float r2 = r * r;
+            float denom = (nDotH * nDotH * (r2 - 1.0) + 1.0);
+            denom = denom * denom * PI;
+
+            return r2 / denom;
+        }
+
+        // Schlick-GGX Approximation to the geometry function
+        // Determines the ratio of microfacets that are overshadowed
+        // by others
+        float geometrySchlick(vec3 N, vec3 V, float k) {
+            float nDotV = max(dot(N, V), 0.0);
+
+            return nDotV / (nDotV * (1.0 - k) + k);
+        }
+
+        // Smith method uses the Schlick method to compute
+        // overshadowing both from the light ray and to the
+        // viewpoint
+        float geometrySmith(vec3 N, vec3 V, vec3 L, float r) {
+            // For direct lighting:
+            float k = (r + 1.0) * (r + 1.0) / 8.0;
+            // For IBL:
+            // float k = r * r / 2.0;
+
+            return geometrySchlick(N, V, k) * geometrySchlick(N, L, k);
+        }
+
+        // note: this isn't the cosTheta I thought it was.
+        // it's actually dot(H, V)
+        vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+            // fix if cosTheta > 1.0
+            cosTheta = min(cosTheta, 1.0);
+            return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+        }
+
+        vec3 fLambert(vec3 albedo) {
+            return albedo / PI;
+        }
+
+        // wo = direction to viewpoint
+        // wi = direction to lightsource
+        vec3 fCookTorrance(vec3 V, vec3 L, vec3 N, vec3 albedo, float roughness, float metalness) {
+            // use F0 = 0.04 for dielectric surfaces (non-metallic)
+            vec3 F0 = vec3(0.04);
+            // for metallic surfaces, mix it towards the albedo of the surface
+            F0 = mix(F0, albedo, metalness);
+            vec3 H = normalize(L + V);
+
+            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+            float G = geometrySmith(N, V, L, roughness);
+            float D = NDF(N, H, roughness);
+
+            vec3 ks = F;
+            vec3 kd = vec3(1.0) - ks;
+            kd *= (1.0 - metalness);
+
+            vec3 lambertDiffuse = kd * fLambert(albedo);
+
+            float denom = (4.0 * max(dot(V, N), 0.0) * max(dot(L, N), 0.0));
+            // ensure no divide by 0
+            denom = max(denom, 0.001);
+            // note that ks is already included in this (it is F)
+            vec3 specularCT = (D * F * G) / denom;
+
+            return lambertDiffuse + specularCT;
+        }
+
+        vec3 illuminate(vec4 albedo, vec4 emissive, vec3 P, vec3 N, vec3 V, float roughness, float metalness) {
             vec3 inColor = albedo.rgb;
             vec3 emissiveColor = emissive.rgb;
             float emissiveStrength = emissive.a;
-
-            float specularCoefficient = albedo.a;
 
             vec3 outColor = vec3(0.0);
 
@@ -256,53 +353,24 @@ void DeferredShadingEffect::createProgram() {
                     float distance = length(lightPositionEyespace - P);
                     attenuation = 1.0 / (1.0 + light.attenuation * pow(distance, 2));
                 }
-                // TODO: Spotlights
 
-                vec3 H = normalize(L + E);
+                vec3 radiance = light.color * light.intensity * attenuation;
 
-                float ao = 1.0;
+                float nDotL = max(dot(N, L), 0.0);
 
-                if (ssaoEnabled > 0.5f) {
-                    ao = texture(ambientOcclusion, vUv).r;
-                }
-
-                vec3 ambient = light.ambientCoefficient * inColor * light.color * light.intensity * ao;
-
-                float diffuseCoefficient = max(0.0, dot(N, L));
-                vec3 diffuse = diffuseCoefficient * inColor * light.color * light.intensity;
-
-                float specularTerm = 0.0;
-
-                if (diffuseCoefficient > 0.0) {
-                    float dir = 0.0;
-                    if (blinnEnabled > 0.5f) {
-                        dir = dot(N, H);
-                    } else {
-                        dir = dot(
-                            E,
-                            reflect(-L, N)
-                        );
-                    }
-                    specularTerm = pow(
-                        max(
-                            0.0,
-                            dir
-                        ),
-                        32.0
-                    );
-                }
-
-                // Specular color can (and should) be a different color than diffuse
-                // this is because it often represents a top glossy layer over the actual paint of the object.
-
-                vec3 specularColor = vec3(1.0, 1.0, 1.0);
-
-                vec3 specular = specularCoefficient * specularTerm * specularColor * light.color * light.intensity;
-
-                // TODO: Shadows
-
-                outColor += ambient + attenuation * (diffuse + specular);
+                outColor += fCookTorrance(V, L, N, inColor, roughness, metalness) * radiance * nDotL;
             }
+
+            float ao = 1.0;
+
+            if (ssaoEnabled > 0.5f) {
+                ao = texture(ambientOcclusion, vUv).r;
+            }
+
+            // improvised ambient term, independent of light sources
+            vec3 ambient = vec3(0.03) * inColor * ao;
+
+            outColor += ambient;
 
             if (emissiveEnabled > 0.5f) {
                 outColor += emissiveStrength * emissiveColor;
@@ -316,15 +384,16 @@ void DeferredShadingEffect::createProgram() {
             vec3 normal = texture(gNormal, vUv).rgb;
             vec4 albedo = texture(gAlbedo, vUv).rgba;
             vec4 emissive = texture(gEmissive, vUv).rgba;
+            vec2 mr = texture(gRoughnessAndMetalness, vUv).rg;
 
             vec3 N = normalize(normal);
-            vec3 E = normalize(-position);
+            vec3 V = normalize(-position);
 
-            if (dot(N, E) < 0.0) {
+            if (dot(N, V) < 0.0) {
                 N = -N;
             }
 
-            vec3 color = illuminate(albedo, emissive, position, N, E);
+            vec3 color = illuminate(albedo, emissive, position, N, V, max(mr.r, 0.001), mr.g);
 
             fragColor = vec4(color, 1.0);
         }
@@ -333,13 +402,12 @@ void DeferredShadingEffect::createProgram() {
     program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 
     glUseProgram(program);
-    glUniform1f(glGetUniformLocation(program, "blinnEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(program, "ssaoEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(program, "emissiveEnabled"), 1.0f);
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
+void DeferredPBREffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
     std::size_t lightIndex = 0;
 
     glUseProgram(program);
@@ -418,28 +486,21 @@ void DeferredShadingEffect::setLights(const std::vector<std::shared_ptr<Light>>&
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::setViewMatrix(const glm::mat4& viewMatrix) {
+void DeferredPBREffect::setViewMatrix(const glm::mat4& viewMatrix) {
     glUseProgram(program);
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::toggleBlinnPhongShading(bool value) {
-    glUseProgram(program);
-    auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
-    glUniform1f(blinnEnabledLocation, value ? 1.0f : 0.0f);
-    glUseProgram(0);
-}
-
-void DeferredShadingEffect::toggleSSAO(bool value) {
+void DeferredPBREffect::toggleSSAO(bool value) {
     glUseProgram(program);
     auto ssaoEnabledLocation = glGetUniformLocation(program, "ssaoEnabled");
     glUniform1f(ssaoEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::render(GLuint vao, GLuint ambientOcclusion) {
+void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion) {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
@@ -464,13 +525,17 @@ void DeferredShadingEffect::render(GLuint vao, GLuint ambientOcclusion) {
     glBindTexture(GL_TEXTURE_2D, emissiveTexture);
 
     glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, roughnessAndMetalnessTexture);
+
+    glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, ambientOcclusion);
 
     glUniform1i(glGetUniformLocation(deferredProgram, "gPosition"), 0);
     glUniform1i(glGetUniformLocation(deferredProgram, "gNormal"), 1);
     glUniform1i(glGetUniformLocation(deferredProgram, "gAlbedo"), 2);
     glUniform1i(glGetUniformLocation(deferredProgram, "gEmissive"), 3);
-    glUniform1i(glGetUniformLocation(deferredProgram, "ambientOcclusion"), 4);
+    glUniform1i(glGetUniformLocation(deferredProgram, "gRoughnessAndMetalness"), 4);
+    glUniform1i(glGetUniformLocation(deferredProgram, "ambientOcclusion"), 5);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

@@ -3,8 +3,9 @@
 #include "lamp.hpp"
 #include "light/directionalLight.hpp"
 #include "light/pointLight.hpp"
-#include "material.hpp"
-#include "deferredMaterial.hpp"
+#include "material/material.hpp"
+#include "material/deferredMaterial.hpp"
+#include "material/deferredPBR.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
 #include "renderer.hpp"
@@ -70,10 +71,17 @@ int main(int argc, char* argv[]) {
     );
 
     std::unique_ptr<Material> deferredMaterial = std::make_unique<DeferredMaterial>(
-        // glm::vec3(0.75164, 0.60648, 0.22648),
-        glm::vec3(0.4, 0.5, 0.5),
+        glm::vec3(0.75164, 0.60648, 0.22648),
         1.0f,
         64.0f
+    );
+
+    std::unique_ptr<Material> pbrMaterial = std::make_unique<DeferredPBRMaterial>(
+        glm::vec3(1.00, 0.71, 0.29), // gold
+        // glm::vec3(0.91, 0.92, 0.92), // aluminum
+        // glm::vec3(0.95, 0.93, 0.88), // silver
+        0.2f,
+        1.0f
     );
 
     // std::shared_ptr<Model> teapot = std::make_shared<Model>(teapotMesh, std::move(material));
@@ -84,6 +92,7 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Model> bunny = std::make_shared<Model>(bunnyMesh, std::move(material));
     bunny->setPosition(glm::vec3(0.3f, -1.00f, 0.0f));
     bunny->addMaterial(MaterialType::deferred, std::move(deferredMaterial));
+    bunny->addMaterial(MaterialType::deferred_pbr, std::move(pbrMaterial));
 
     renderer.addModel(bunny);
 
@@ -103,11 +112,19 @@ int main(int argc, char* argv[]) {
         64.0f
     );
 
+    std::unique_ptr<Material> boxPBRMaterial = std::make_unique<DeferredPBRMaterial>(
+        glm::vec3(0.66, 0.66, 0.66),
+        0.0f,
+        0.0f
+    );
+
     boxMaterial->setSide(Side::BACK);
     boxDeferredMaterial->setSide(Side::BACK);
+    boxPBRMaterial->setSide(Side::BACK);
 
     std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
     box->addMaterial(MaterialType::deferred, std::move(boxDeferredMaterial));
+    box->addMaterial(MaterialType::deferred_pbr, std::move(boxPBRMaterial));
     renderer.addModel(box);
 
 
@@ -150,6 +167,13 @@ int main(int argc, char* argv[]) {
         10.0f
     };
 
+    lamp1.toggle();
+    lamp2.toggle();
+    lamp3.toggle();
+    lamp4.toggle();
+
+    sun->toggle();
+    sun2->toggle();
     unsigned int currentExposure = 4;
 
     bool mouseDown = false;
@@ -223,6 +247,8 @@ int main(int argc, char* argv[]) {
                         }
 
                         renderer.setExposure(exposureValues.at(currentExposure));
+                    } else if (key == "P") {
+                        renderer.togglePBR();
                     }
                 }
             }

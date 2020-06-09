@@ -3,7 +3,7 @@
 #include "camera.hpp"
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
-#include "material.hpp"
+#include "material/material.hpp"
 #include "model.hpp"
 #include "renderTarget.hpp"
 
@@ -20,6 +20,7 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     camera(std::move(camera)),
     bloomEffect(width, height),
     deferredShadingEffect(width, height),
+    deferredPBREffect(width, height),
     ssaoEffect(width, height),
     fxaaEffect(width, height)
 {
@@ -40,8 +41,9 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     sceneTarget = std::make_unique<RenderTarget>(width, height);
 
     deferredShadingEffect.initialize();
+    deferredPBREffect.initialize();
     ssaoEffect.initialize();
-    bloomEffect.initialize(deferredShadingEffect.getOutputTexture());
+    bloomEffect.initialize();
     fxaaEffect.initialize();
 
     // composits bloom, hdr, and gammaCorrection
@@ -323,6 +325,10 @@ void Renderer::toggleFXAA() {
     FXAAEnabled = !FXAAEnabled;
 }
 
+void Renderer::togglePBR() {
+    pbrEnabled = !pbrEnabled;
+}
+
 void Renderer::toggleBlinnPhongShading() {
     blinnPhongShadingEnabled = !blinnPhongShadingEnabled;
     for (auto model : models) {
@@ -334,6 +340,7 @@ void Renderer::toggleBlinnPhongShading() {
 void Renderer::toggleSSAO() {
     ssaoEnabled = !ssaoEnabled;
     deferredShadingEffect.toggleSSAO(ssaoEnabled);
+    deferredPBREffect.toggleSSAO(ssaoEnabled);
 }
 
 void Renderer::setExposure(float value) {
@@ -371,8 +378,7 @@ void Renderer::render() {
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     // render the bloom effect
-    bloomEffect.setSceneTexture(sceneTarget->getTexture());
-    bloomEffect.render(screenObject.vertexArray);
+    bloomEffect.render(screenObject.vertexArray, sceneTarget->getTexture());
 
     // Bind the screen framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -402,7 +408,12 @@ void Renderer::render() {
 }
 
 void Renderer::renderDeferred() {
-    auto deferredBuffer = deferredShadingEffect.getFramebuffer();
+    GLuint deferredBuffer = 0;
+    if (pbrEnabled) {
+        deferredBuffer = deferredPBREffect.getFramebuffer();
+    } else {
+        deferredBuffer = deferredShadingEffect.getFramebuffer();
+    }
     // Bind the scene buffer
     glBindFramebuffer(GL_FRAMEBUFFER, deferredBuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -412,7 +423,10 @@ void Renderer::renderDeferred() {
         for (auto& model : models) {
             model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
         }
+
+        deferredPBREffect.setViewMatrix(camera->getViewMatrix());
         deferredShadingEffect.setViewMatrix(camera->getViewMatrix());
+
         ssaoEffect.setProjectionMatrix(camera->getProjectionMatrix());
         camera->setDirty(false);
     }
@@ -421,24 +435,32 @@ void Renderer::renderDeferred() {
         model->setLights(lights);
     }
 
-    deferredShadingEffect.setLights(lights);
+    if (pbrEnabled) {
+        deferredPBREffect.setLights(lights);
+    } else {
+        deferredShadingEffect.setLights(lights);
+    }
 
     // ensure models have deferred material applied
     // todo: support multiple materials per model
     for (auto& model : models) {
         model->applyModelMatrix();
-        model->draw(MaterialType::deferred);
+        model->draw(pbrEnabled ? MaterialType::deferred_pbr : MaterialType::deferred);
     }
 
     // render the ambient occlusion term
-    ssaoEffect.render(screenObject.vertexArray, deferredShadingEffect.getPosition(), deferredShadingEffect.getNormal());
 
-    // render the bloom effect
-    bloomEffect.setSceneTexture(deferredShadingEffect.getOutputTexture());
-    bloomEffect.render(screenObject.vertexArray);
-
-    // do the deferred lighting step
-    deferredShadingEffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
+    if (pbrEnabled) {
+        ssaoEffect.render(screenObject.vertexArray, deferredPBREffect.getPosition(), deferredPBREffect.getNormal());
+        bloomEffect.render(screenObject.vertexArray, deferredPBREffect.getOutputTexture());
+        // do the deferred lighting step
+        deferredPBREffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
+    } else {
+        ssaoEffect.render(screenObject.vertexArray, deferredShadingEffect.getPosition(), deferredShadingEffect.getNormal());
+        bloomEffect.render(screenObject.vertexArray, deferredShadingEffect.getOutputTexture());
+        // do the deferred lighting step
+        deferredShadingEffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
+    }
 
     // Render the compositing pass
     // Bind the screen framebuffer
@@ -452,7 +474,12 @@ void Renderer::renderDeferred() {
     glUseProgram(compositingPass.program);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, deferredShadingEffect.getOutputTexture());
+    if (pbrEnabled) {
+        glBindTexture(GL_TEXTURE_2D, deferredPBREffect.getOutputTexture());
+    } else {
+        glBindTexture(GL_TEXTURE_2D, deferredShadingEffect.getOutputTexture());
+    }
+
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomEffect.getBlurTexture());
 

@@ -2,8 +2,9 @@
 
 #include "light/light.hpp"
 #include "light/pointLight.hpp"
-#include "material.hpp"
-#include "deferredMaterial.hpp"
+#include "material/material.hpp"
+#include "material/deferredMaterial.hpp"
+#include "material/deferredPBR.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
 
@@ -39,10 +40,22 @@ Lamp::Lamp(
     deferredMaterial->setEmissiveColorAndStrength(color, intensity);
     deferredMaterial->toggleEmissive(true);
 
+    std::unique_ptr<Material> pbrMaterial = std::make_unique<DeferredPBRMaterial>(
+        color,
+        0.2f,
+        1.0f
+    );
+
+    pbrMaterial->create();
+
+    pbrMaterial->setEmissiveColorAndStrength(color, intensity);
+    pbrMaterial->toggleEmissive(true);
+
     model = std::make_shared<Model>(mesh, std::move(material));
     model->setPosition(position);
 
     model->addMaterial(MaterialType::deferred, std::move(deferredMaterial));
+    model->addMaterial(MaterialType::deferred_pbr, std::move(pbrMaterial));
 
     light = std::make_shared<PointLight>(
         position,

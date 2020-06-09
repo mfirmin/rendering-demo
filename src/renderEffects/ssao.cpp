@@ -183,8 +183,8 @@ void SSAOEffect::createProgram() {
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "width"), width);
     glUniform1f(glGetUniformLocation(program, "height"), height);
-    glUniform1f(glGetUniformLocation(program, "radius"), 1.0f);
-    glUniform1f(glGetUniformLocation(program, "bias"), 0.025f);
+    glUniform1f(glGetUniformLocation(program, "radius"), 0.1f);
+    glUniform1f(glGetUniformLocation(program, "bias"), 0.0025f);
 
     glUniform1i(glGetUniformLocation(program, "samplesToUse"), kernel.size());
 

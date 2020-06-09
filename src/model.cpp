@@ -1,6 +1,6 @@
 #include "model.hpp"
 
-#include "material.hpp"
+#include "material/material.hpp"
 #include "mesh.hpp"
 
 #include <GL/glew.h>

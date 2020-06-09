@@ -2,6 +2,7 @@
 
 #include "renderEffects/bloom.hpp"
 #include "renderEffects/deferredShading.hpp"
+#include "renderEffects/deferredPBR.hpp"
 #include "renderEffects/fxaa.hpp"
 #include "renderEffects/ssao.hpp"
 
@@ -40,6 +41,7 @@ class Renderer {
         void toggleHDR();
         void toggleGammaCorrection();
         void toggleSSAO();
+        void togglePBR();
         void updateCameraRotation(glm::vec3 r);
 
         void setExposure(float value);
@@ -77,6 +79,7 @@ class Renderer {
 
         BloomEffect bloomEffect;
         DeferredShadingEffect deferredShadingEffect;
+        DeferredPBREffect deferredPBREffect;
         SSAOEffect ssaoEffect;
         FXAAEffect fxaaEffect;
 
@@ -87,6 +90,7 @@ class Renderer {
         bool gammaCorrectionEnabled = true;
         bool bloomEnabled = true;
         bool ssaoEnabled = true;
+        bool pbrEnabled = true;
 
         bool initializeSDL();
         bool initializeGL();

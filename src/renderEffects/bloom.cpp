@@ -15,12 +15,11 @@ BloomEffect::~BloomEffect() {
 }
 
 // Must call this AFTER GL/SDL have been initialized
-void BloomEffect::initialize(GLuint st) {
+void BloomEffect::initialize() {
     initializeBrightnessBuffers();
     initializeBlurBuffers();
     initializeBrightnessProgram();
     initializeBlurProgram();
-    setSceneTexture(st);
 }
 
 void BloomEffect::initializeBrightnessBuffers() {
@@ -178,7 +177,7 @@ void BloomEffect::initializeBlurProgram() {
 }
 
 // vao should be a triangle strip quad
-void BloomEffect::render(GLuint vao) {
+void BloomEffect::render(GLuint vao, GLuint sceneTexture) {
     // bind the framebuffer for the bloom effect
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 

@@ -15,13 +15,9 @@ class BloomEffect {
 
         ~BloomEffect();
 
-        void initialize(GLuint st);
+        void initialize();
 
-        void render(GLuint vao);
-
-        void setSceneTexture(GLuint st) {
-            sceneTexture = st;
-        }
+        void render(GLuint vao, GLuint sceneTexture);
 
         GLuint getBrightnessTexture() {
             return brightnessTexture;
@@ -36,9 +32,6 @@ class BloomEffect {
         int height;
 
         static const int passes = 10;
-
-        // input
-        GLuint sceneTexture = 0;
 
         // output
         GLuint framebuffer = 0;

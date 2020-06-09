@@ -8,17 +8,17 @@
 
 class Light;
 
-class DeferredShadingEffect {
+class DeferredPBREffect {
     public:
-        DeferredShadingEffect(int width, int height);
+        DeferredPBREffect(int width, int height);
 
-        DeferredShadingEffect(DeferredShadingEffect&& other) = default;
-        DeferredShadingEffect& operator=(DeferredShadingEffect&& other) = default;
+        DeferredPBREffect(DeferredPBREffect&& other) = default;
+        DeferredPBREffect& operator=(DeferredPBREffect&& other) = default;
 
-        DeferredShadingEffect(const DeferredShadingEffect& other) = delete;
-        DeferredShadingEffect& operator=(const DeferredShadingEffect& other) = delete;
+        DeferredPBREffect(const DeferredPBREffect& other) = delete;
+        DeferredPBREffect& operator=(const DeferredPBREffect& other) = delete;
 
-        ~DeferredShadingEffect();
+        ~DeferredPBREffect();
 
         void initialize();
 
@@ -64,7 +64,6 @@ class DeferredShadingEffect {
             const glm::mat4& viewMatrix
         );
 
-        void toggleBlinnPhongShading(bool value);
         void toggleSSAO(bool value);
 
         void render(GLuint vao, GLuint ambientOcclusion);
@@ -77,6 +76,7 @@ class DeferredShadingEffect {
         GLuint normalTexture = 0;
         GLuint albedoTexture = 0;
         GLuint emissiveTexture = 0;
+        GLuint roughnessAndMetalnessTexture = 0;
 
         GLuint depthBuffer = 0;
 
