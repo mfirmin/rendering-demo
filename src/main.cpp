@@ -1,11 +1,13 @@
 
 #include "camera.hpp"
+#include "compute/hdri.hpp"
 #include "lamp.hpp"
 #include "light/directionalLight.hpp"
 #include "light/pointLight.hpp"
 #include "material/material.hpp"
 #include "material/deferredMaterial.hpp"
 #include "material/deferredPBR.hpp"
+#include "material/skybox.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
 #include "renderer.hpp"
@@ -53,7 +55,7 @@ int main(int argc, char* argv[]) {
         0.2f
     );
 
-    auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+    auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.000f, glm::vec3(0.0f, 0.0f, 0.0f));
     auto renderer = Renderer(width, height, std::move(camera));
 
     sun->toggle();
@@ -61,6 +63,21 @@ int main(int argc, char* argv[]) {
 
     renderer.addLight(sun);
     renderer.addLight(sun2);
+
+    auto hdri = HDRI("assets/images/ballroom_4k.hdr");
+    hdri.initialize();
+
+    std::shared_ptr<Mesh> skyboxMesh = std::make_shared<Mesh>();
+    skyboxMesh->fromOBJ("assets/unit_cube.obj");
+
+    std::unique_ptr<Material> skyboxMaterial = std::make_unique<SkyboxMaterial>(hdri.getCubemap());
+
+    skyboxMaterial->setSide(Side::BACK);
+
+    std::shared_ptr<Model> skybox = std::make_shared<Model>(skyboxMesh, std::move(skyboxMaterial));
+
+
+    renderer.addModel(skybox);
 
     // std::shared_ptr<Mesh> teapotMesh = std::make_shared<Mesh>();
     // teapotMesh->fromOBJ("assets/teapot.obj");
@@ -132,7 +149,7 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
     box->addMaterial(MaterialType::deferred, std::move(boxDeferredMaterial));
     box->addMaterial(MaterialType::deferred_pbr, std::move(boxPBRMaterial));
-    renderer.addModel(box);
+    // renderer.addModel(box);
 
 
     int lamp1Intensity = 2;
@@ -284,7 +301,8 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            renderer.renderDeferred();
+            renderer.render();
+//            renderer.renderDeferred();
             last = now;
         }
 

@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 
 #include "camera.hpp"
+#include "compute/hdri.hpp"
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
 #include "material/material.hpp"
@@ -107,6 +108,9 @@ bool Renderer::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     // Enable writing to depth buffer
     glDepthMask(GL_TRUE);
+
+    // necessary for cubemaps to work correctly
+    glDepthFunc(GL_LEQUAL);
     // Enable MultiSampling
     glEnable(GL_MULTISAMPLE);
     // Enable face culling
@@ -231,9 +235,9 @@ void Renderer::initializeCompositingPass() {
     compositingPass.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 
     glUseProgram(compositingPass.program);
-    glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), hdrEnabled ? 1.0f : 0.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), gammaCorrectionEnabled ? 1.0f : 0.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), bloomEnabled ? 1.0f : 0.0f);
     glUniform1f(glGetUniformLocation(compositingPass.program, "exposure"), 1.0f);
     glUseProgram(0);
 }
@@ -350,6 +354,8 @@ void Renderer::setExposure(float value) {
 }
 
 void Renderer::render() {
+    glViewport(0, 0, width, height);
+
     auto msFBO = sceneTarget->getMultiSampleFramebuffer();
     auto outFBO = sceneTarget->getOutputFramebuffer();
     // Bind the scene buffer
@@ -408,6 +414,8 @@ void Renderer::render() {
 }
 
 void Renderer::renderDeferred() {
+    glViewport(0, 0, width, height);
+
     GLuint deferredBuffer = 0;
     if (pbrEnabled) {
         deferredBuffer = deferredPBREffect.getFramebuffer();
@@ -508,6 +516,22 @@ void Renderer::renderDeferred() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glUseProgram(0);
     }
+
+    // Swap
+    SDL_GL_SwapWindow(window);
+}
+
+void Renderer::renderIBLTest(HDRI& environmentMap) {
+    glViewport(0, 0, width, height);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (camera->isDirty()) {
+        environmentMap.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+    }
+
+    environmentMap.renderCube();
 
     // Swap
     SDL_GL_SwapWindow(window);

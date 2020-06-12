@@ -44,6 +44,7 @@ set(SOURCES
     src/gl/shaderUtils.cpp
     src/gl/glObject.cpp
     src/camera.cpp
+    src/compute/hdri.cpp
     src/lamp.cpp
     src/light/light.cpp
     src/light/directionalLight.cpp
@@ -52,6 +53,7 @@ set(SOURCES
     src/material/deferredMaterial.cpp
     src/material/deferredPBR.cpp
     src/material/material.cpp
+    src/material/skybox.cpp
     src/mesh.cpp
     src/model.cpp
     src/renderer.cpp

@@ -16,6 +16,7 @@
 class Camera;
 class Light;
 class Model;
+class HDRI;
 
 class RenderTarget;
 
@@ -34,6 +35,8 @@ class Renderer {
 
         void render();
         void renderDeferred();
+        void renderIBLTest(HDRI& environmentMap);
+
         void toggleBloom();
         void toggleMSAA();
         void toggleFXAA();
@@ -88,7 +91,7 @@ class Renderer {
         bool blinnPhongShadingEnabled = true;
         bool hdrEnabled = true;
         bool gammaCorrectionEnabled = true;
-        bool bloomEnabled = true;
+        bool bloomEnabled = false;
         bool ssaoEnabled = true;
         bool pbrEnabled = true;
 
