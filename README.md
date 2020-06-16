@@ -25,8 +25,8 @@ TODO
   - [ ] Image-Based Ambient Lighting
       - [X] Diffuse Irradiance
       - [ ] Specular
-- [ ] Shadow Mapping
 - [X] Environment Maps
+- [ ] Add Control Panel rather than keyboard shortcuts
 
 
 # Requirements
