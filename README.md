@@ -23,7 +23,7 @@ TODO
   - [X] SSAO
   - [X] PBR
   - [ ] Image-Based Ambient Lighting
-      - [ ] Diffuse Irradiance
+      - [X] Diffuse Irradiance
       - [ ] Specular
 - [ ] Shadow Mapping
 - [X] Environment Maps
