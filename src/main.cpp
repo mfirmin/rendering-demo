@@ -1,6 +1,7 @@
 
 #include "camera.hpp"
 #include "compute/hdri.hpp"
+#include "compute/ibl.hpp"
 #include "lamp.hpp"
 #include "light/directionalLight.hpp"
 #include "light/pointLight.hpp"
@@ -61,16 +62,19 @@ int main(int argc, char* argv[]) {
     sun->toggle();
     sun2->toggle();
 
-    renderer.addLight(sun);
-    renderer.addLight(sun2);
+    // renderer.addLight(sun);
+    // renderer.addLight(sun2);
 
-    auto hdri = HDRI("assets/images/ballroom_4k.hdr");
+    auto hdri = HDRI("assets/images/grand_canyon.hdr");
     hdri.initialize();
+
+    auto ibl = IBL();
+    ibl.initialize(hdri.getCubemap());
 
     std::shared_ptr<Mesh> skyboxMesh = std::make_shared<Mesh>();
     skyboxMesh->fromOBJ("assets/unit_cube.obj");
 
-    std::unique_ptr<Material> skyboxMaterial = std::make_unique<SkyboxMaterial>(hdri.getCubemap());
+    std::unique_ptr<Material> skyboxMaterial = std::make_unique<SkyboxMaterial>(ibl.getDiffuseIrradiance());
 
     skyboxMaterial->setSide(Side::BACK);
 
@@ -118,7 +122,7 @@ int main(int argc, char* argv[]) {
     bunny->addMaterial(MaterialType::deferred, std::move(deferredMaterial));
     bunny->addMaterial(MaterialType::deferred_pbr, std::move(pbrMaterial));
 
-    renderer.addModel(bunny);
+    // renderer.addModel(bunny);
 
 
     std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
@@ -156,26 +160,26 @@ int main(int argc, char* argv[]) {
     Lamp lamp1(sphereMesh, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.8f, 0.6f, 0.4f), static_cast<float>(lamp1Intensity));
     lamp1.setScale(0.1f);
 
-    renderer.addModel(lamp1.getModel());
-    renderer.addLight(lamp1.getLight());
+    // renderer.addModel(lamp1.getModel());
+    // renderer.addLight(lamp1.getLight());
 
     Lamp lamp2(sphereMesh, glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(0.2f, 0.9f, 0.5f), 2.0f);
     lamp2.setScale(0.1f);
 
-    renderer.addModel(lamp2.getModel());
-    renderer.addLight(lamp2.getLight());
+    // renderer.addModel(lamp2.getModel());
+    // renderer.addLight(lamp2.getLight());
 
     Lamp lamp3(sphereMesh, glm::vec3(0.0f, 0.1f, 1.5f), glm::vec3(0.2f, 0.2f, 0.9f), 4.0f);
     lamp3.setScale(0.2f);
 
-    renderer.addModel(lamp3.getModel());
-    renderer.addLight(lamp3.getLight());
+    // renderer.addModel(lamp3.getModel());
+    // renderer.addLight(lamp3.getLight());
 
     Lamp lamp4(sphereMesh, glm::vec3(-1.0f, 1.5f, 1.5f), glm::vec3(0.9f, 0.2f, 0.1f), 4.0f);
     lamp4.setScale(0.05f);
 
-    renderer.addModel(lamp4.getModel());
-    renderer.addLight(lamp4.getLight());
+    // renderer.addModel(lamp4.getModel());
+    // renderer.addLight(lamp4.getLight());
 
     float frameLength = ONE_SECOND / FPS;
     auto last = std::chrono::steady_clock::now();
@@ -301,6 +305,7 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
+            // renderer.renderIBLTest(hdri);
             renderer.render();
 //            renderer.renderDeferred();
             last = now;

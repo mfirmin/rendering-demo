@@ -9,19 +9,6 @@
 #include <string>
 #include <vector>
 
-// create an image for each of the 6 faces of the cubemap
-const unsigned int CUBE_FACES = 6;
-const unsigned int TEXTURE_WIDTH = 4096;
-const unsigned int TEXTURE_HEIGHT = TEXTURE_WIDTH;
-
-const glm::vec3 ZERO(0.0f, 0.0f, 0.0f);
-const glm::vec3 LEFT(-1.0f, 0.0f, 0.0f);
-const glm::vec3 RIGHT(1.0f, 0.0f, 0.0f);
-const glm::vec3 UP(0.0f, 1.0f, 0.0f);
-const glm::vec3 DOWN(0.0f, -1.0f, 0.0f);
-const glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
-const glm::vec3 BACKWARD(0.0f, 0.0f, -1.0f);
-
 class HDRI {
     public:
         HDRI(std::string filename);
@@ -48,6 +35,20 @@ class HDRI {
 
         ~HDRI();
     private:
+        static constexpr unsigned int CUBE_FACES = 6;
+        // Since diffuse irradiance doesn't vary much over N, we can store
+        // a very low detailed texture
+        static constexpr unsigned int TEXTURE_WIDTH = 512;
+        static constexpr unsigned int TEXTURE_HEIGHT = TEXTURE_WIDTH;
+
+        static constexpr glm::vec3 ZERO = glm::vec3(0.0f, 0.0f, 0.0f);
+        static constexpr glm::vec3 LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
+        static constexpr glm::vec3 RIGHT= glm::vec3(1.0f, 0.0f, 0.0f);
+        static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
+        static constexpr glm::vec3 DOWN = glm::vec3(0.0f, -1.0f, 0.0f);
+        static constexpr glm::vec3 FORWARD = glm::vec3(0.0f, 0.0f, 1.0f);
+        static constexpr glm::vec3 BACKWARD = glm::vec3(0.0f, 0.0f, -1.0f);
+
         std::string filename;
 
         int width = 0;

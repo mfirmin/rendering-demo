@@ -112,7 +112,7 @@ bool Renderer::initializeGL() {
     // necessary for cubemaps to work correctly
     glDepthFunc(GL_LEQUAL);
     // Enable MultiSampling
-    glEnable(GL_MULTISAMPLE);
+    // glEnable(GL_MULTISAMPLE);
     // Enable face culling
     glEnable(GL_CULL_FACE);
 
@@ -360,7 +360,8 @@ void Renderer::render() {
     auto outFBO = sceneTarget->getOutputFramebuffer();
     // Bind the scene buffer
     glBindFramebuffer(GL_FRAMEBUFFER, msFBO);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (camera->isDirty()) {
@@ -378,6 +379,8 @@ void Renderer::render() {
         model->applyModelMatrix();
         model->draw(MaterialType::standard);
     }
+
+    glUseProgram(0);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, msFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFBO);
@@ -523,15 +526,24 @@ void Renderer::renderDeferred() {
 
 void Renderer::renderIBLTest(HDRI& environmentMap) {
     glViewport(0, 0, width, height);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    // Clear it
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (camera->isDirty()) {
-        environmentMap.setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
-    }
+    // render the screen object to it (using the scene render target)
+    glBindVertexArray(screenObject.vertexArray);
+    glUseProgram(compositingPass.program);
 
-    environmentMap.renderCube();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, environmentMap.getTexture());
+
+    glUniform1i(glGetUniformLocation(compositingPass.program, "scene"), 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glUseProgram(0);
 
     // Swap
     SDL_GL_SwapWindow(window);

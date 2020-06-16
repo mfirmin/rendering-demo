@@ -45,6 +45,7 @@ set(SOURCES
     src/gl/glObject.cpp
     src/camera.cpp
     src/compute/hdri.cpp
+    src/compute/ibl.cpp
     src/lamp.cpp
     src/light/light.cpp
     src/light/directionalLight.cpp

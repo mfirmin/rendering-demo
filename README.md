@@ -65,4 +65,6 @@ make
 
 # Credits
 
-- Environment Maps: Sergej Majboroda (https://hdrihaven.com/)
+- Environment Maps: 
+- Ballroom - Sergej Majboroda (https://hdrihaven.com/)
+- Grand Canyon - Blochi (http://www.hdrlabs.com/sibl/archive.html)
