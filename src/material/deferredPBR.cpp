@@ -54,8 +54,6 @@ void DeferredPBRMaterial::create() {
         layout(location = 3) out vec4 emissive;
         layout(location = 4) out vec2 roughnessAndMetalness;
 
-        uniform mat4 viewMatrix;
-
         uniform vec3 color;
         uniform float specularCoefficient;
 

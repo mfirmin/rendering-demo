@@ -12,11 +12,10 @@
 #include <random>
 
 
-HDRI::HDRI(std::string filename) :
-    filename(filename)
-{}
+HDRI::HDRI() {}
 
-void HDRI::initialize() {
+void HDRI::initialize(std::string f) {
+    filename = f;
     loadTexture();
     createCubemap();
     createProgram();

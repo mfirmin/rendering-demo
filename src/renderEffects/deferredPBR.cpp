@@ -227,6 +227,7 @@ void DeferredPBREffect::createProgram() {
 
         uniform float emissiveEnabled;
         uniform float ssaoEnabled;
+        uniform float iblEnabled;
 
         uniform int numLights;
         uniform struct Light {
@@ -248,6 +249,9 @@ void DeferredPBREffect::createProgram() {
         uniform sampler2D gEmissive;
         uniform sampler2D gRoughnessAndMetalness;
         uniform sampler2D ambientOcclusion;
+
+        // IBL
+        uniform samplerCube diffuseIrradianceMap;
 
         in vec2 vUv;
 
@@ -295,17 +299,20 @@ void DeferredPBREffect::createProgram() {
             return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
         }
 
+        // variation of fresnelSchlick accounting for roughness, used by IBL
+        // as we don't have a halfway vector for IBL
+        vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+            cosTheta = min(cosTheta, 1.0);
+            return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+        }
+
         vec3 fLambert(vec3 albedo) {
             return albedo / PI;
         }
 
         // wo = direction to viewpoint
         // wi = direction to lightsource
-        vec3 fCookTorrance(vec3 V, vec3 L, vec3 N, vec3 albedo, float roughness, float metalness) {
-            // use F0 = 0.04 for dielectric surfaces (non-metallic)
-            vec3 F0 = vec3(0.04);
-            // for metallic surfaces, mix it towards the albedo of the surface
-            F0 = mix(F0, albedo, metalness);
+        vec3 fCookTorrance(vec3 V, vec3 L, vec3 N, vec3 albedo, vec3 F0, float roughness, float metalness) {
             vec3 H = normalize(L + V);
 
             vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
@@ -331,6 +338,11 @@ void DeferredPBREffect::createProgram() {
             vec3 inColor = albedo.rgb;
             vec3 emissiveColor = emissive.rgb;
             float emissiveStrength = emissive.a;
+
+            // use F0 = 0.04 for dielectric surfaces (non-metallic)
+            vec3 F0 = vec3(0.04);
+            // for metallic surfaces, mix it towards the albedo of the surface
+            F0 = mix(F0, inColor, metalness);
 
             vec3 outColor = vec3(0.0);
 
@@ -358,7 +370,7 @@ void DeferredPBREffect::createProgram() {
 
                 float nDotL = max(dot(N, L), 0.0);
 
-                outColor += fCookTorrance(V, L, N, inColor, roughness, metalness) * radiance * nDotL;
+                outColor += fCookTorrance(V, L, N, inColor, F0, roughness, metalness) * radiance * nDotL;
             }
 
             float ao = 1.0;
@@ -367,10 +379,24 @@ void DeferredPBREffect::createProgram() {
                 ao = texture(ambientOcclusion, vUv).r;
             }
 
-            // improvised ambient term, independent of light sources
-            vec3 ambient = vec3(0.03) * inColor * ao;
+            if (iblEnabled < 0.5f) {
+                // improvised ambient term, independent of light sources
+                vec3 ambient = vec3(0.03) * inColor * ao;
 
-            outColor += ambient;
+                outColor += ambient;
+            } else {
+                vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+                vec3 kD = 1.0 - kS;
+                kD *= (1.0 - metalness);
+
+                vec3 irradiance = texture(diffuseIrradianceMap, N).rgb;
+                // diffuse term is scene irradiance * albedo scaled by ambient occlusion
+                // Note that diffuse and ambient are now combined into one term,
+                // rather than having a separate ambient term (which was a hack anyway)
+                vec3 diffuse = kD * irradiance * inColor * ao;
+
+                outColor += diffuse;
+            }
 
             if (emissiveEnabled > 0.5f) {
                 outColor += emissiveStrength * emissiveColor;
@@ -380,10 +406,11 @@ void DeferredPBREffect::createProgram() {
         }
 
         void main() {
-            vec3 position = texture(gPosition, vUv).rgb;
+            vec4 p = texture(gPosition, vUv);
+            vec3 position = p.xyz;
             vec3 normal = texture(gNormal, vUv).rgb;
-            vec4 albedo = texture(gAlbedo, vUv).rgba;
-            vec4 emissive = texture(gEmissive, vUv).rgba;
+            vec4 albedo = texture(gAlbedo, vUv);
+            vec4 emissive = texture(gEmissive, vUv);
             vec2 mr = texture(gRoughnessAndMetalness, vUv).rg;
 
             vec3 N = normalize(normal);
@@ -393,7 +420,12 @@ void DeferredPBREffect::createProgram() {
                 N = -N;
             }
 
-            vec3 color = illuminate(albedo, emissive, position, N, V, max(mr.r, 0.01), mr.g);
+            vec3 color = albedo.rgb;
+            // only apply illumination if position's w component is 1
+            // For instance, the skybox should not be illuminated
+            if (p.w > 0.5f) {
+                color = illuminate(albedo, emissive, position, N, V, max(mr.r, 0.01), mr.g);
+            }
 
             fragColor = vec4(color, 1.0);
         }
@@ -404,6 +436,7 @@ void DeferredPBREffect::createProgram() {
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "ssaoEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(program, "emissiveEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(program, "iblEnabled"), 0.0f);
     glUseProgram(0);
 }
 
@@ -500,7 +533,14 @@ void DeferredPBREffect::toggleSSAO(bool value) {
     glUseProgram(0);
 }
 
-void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion) {
+void DeferredPBREffect::toggleIBL(bool value) {
+    glUseProgram(program);
+    auto iblEnabledLocation = glGetUniformLocation(program, "iblEnabled");
+    glUniform1f(iblEnabledLocation, value ? 1.0f : 0.0f);
+    glUseProgram(0);
+}
+
+void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion, GLuint diffuseIrradianceMap) {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
@@ -530,12 +570,16 @@ void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion) {
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, ambientOcclusion);
 
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, diffuseIrradianceMap);
+
     glUniform1i(glGetUniformLocation(deferredProgram, "gPosition"), 0);
     glUniform1i(glGetUniformLocation(deferredProgram, "gNormal"), 1);
     glUniform1i(glGetUniformLocation(deferredProgram, "gAlbedo"), 2);
     glUniform1i(glGetUniformLocation(deferredProgram, "gEmissive"), 3);
     glUniform1i(glGetUniformLocation(deferredProgram, "gRoughnessAndMetalness"), 4);
     glUniform1i(glGetUniformLocation(deferredProgram, "ambientOcclusion"), 5);
+    glUniform1i(glGetUniformLocation(deferredProgram, "diffuseIrradianceMap"), 6);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

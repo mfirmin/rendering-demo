@@ -312,10 +312,12 @@ void DeferredShadingEffect::createProgram() {
         }
 
         void main() {
-            vec3 position = texture(gPosition, vUv).rgb;
+            vec4 p = texture(gPosition, vUv);
+            vec3 position = p.xyz;
+
             vec3 normal = texture(gNormal, vUv).rgb;
-            vec4 albedo = texture(gAlbedo, vUv).rgba;
-            vec4 emissive = texture(gEmissive, vUv).rgba;
+            vec4 albedo = texture(gAlbedo, vUv);
+            vec4 emissive = texture(gEmissive, vUv);
 
             vec3 N = normalize(normal);
             vec3 E = normalize(-position);
@@ -324,7 +326,11 @@ void DeferredShadingEffect::createProgram() {
                 N = -N;
             }
 
-            vec3 color = illuminate(albedo, emissive, position, N, E);
+            vec3 color = albedo.rgb;
+
+            if (p.w > 0.5f) {
+                color = illuminate(albedo, emissive, position, N, E);
+            }
 
             fragColor = vec4(color, 1.0);
         }
@@ -437,6 +443,10 @@ void DeferredShadingEffect::toggleSSAO(bool value) {
     auto ssaoEnabledLocation = glGetUniformLocation(program, "ssaoEnabled");
     glUniform1f(ssaoEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
+}
+
+void DeferredShadingEffect::toggleIBL(bool value) {
+    (void)value;
 }
 
 void DeferredShadingEffect::render(GLuint vao, GLuint ambientOcclusion) {

@@ -65,8 +65,9 @@ class DeferredPBREffect {
         );
 
         void toggleSSAO(bool value);
+        void toggleIBL(bool value);
 
-        void render(GLuint vao, GLuint ambientOcclusion);
+        void render(GLuint vao, GLuint ambientOcclusion, GLuint diffuseIrradianceMap);
     private:
         int width;
         int height;

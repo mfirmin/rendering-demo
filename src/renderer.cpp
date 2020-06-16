@@ -1,10 +1,11 @@
 #include "renderer.hpp"
 
 #include "camera.hpp"
-#include "compute/hdri.hpp"
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
 #include "material/material.hpp"
+#include "material/skybox.hpp"
+#include "material/skyboxDeferred.hpp"
 #include "model.hpp"
 #include "renderTarget.hpp"
 
@@ -316,6 +317,12 @@ void Renderer::toggleHDR() {
     glUseProgram(0);
 }
 
+void Renderer::toggleIBL() {
+    iblEnabled = !iblEnabled;
+    deferredShadingEffect.toggleIBL(iblEnabled);
+    deferredPBREffect.toggleIBL(iblEnabled);
+}
+
 void Renderer::toggleMSAA() {
     if (MSAAEnabled) {
         glDisable(GL_MULTISAMPLE);
@@ -351,6 +358,32 @@ void Renderer::setExposure(float value) {
     glUseProgram(compositingPass.program);
     glUniform1f(glGetUniformLocation(compositingPass.program, "exposure"), value);
     glUseProgram(0);
+}
+
+void Renderer::setEnvironmentMap(std::string file) {
+    environmentMap.initialize(file);
+
+    ibl.initialize(environmentMap.getCubemap());
+
+    std::shared_ptr<Mesh> skyboxMesh = std::make_shared<Mesh>();
+    skyboxMesh->fromOBJ("assets/unit_cube.obj");
+
+    std::unique_ptr<Material> skyboxMaterial = std::make_unique<SkyboxMaterial>(environmentMap.getCubemap());
+
+    skyboxMaterial->setSide(Side::BACK);
+
+    std::unique_ptr<Material> skyboxDeferredMaterial = std::make_unique<SkyboxDeferredMaterial>(environmentMap.getCubemap());
+
+    skyboxDeferredMaterial->setSide(Side::BACK);
+
+    std::unique_ptr<Material> skyboxDeferredPBR = std::make_unique<SkyboxDeferredMaterial>(environmentMap.getCubemap());
+
+    skyboxDeferredPBR->setSide(Side::BACK);
+
+    skybox = std::make_shared<Model>(skyboxMesh, std::move(skyboxMaterial));
+
+    skybox->addMaterial(MaterialType::deferred, std::move(skyboxDeferredMaterial));
+    skybox->addMaterial(MaterialType::deferred_pbr, std::move(skyboxDeferredPBR));
 }
 
 void Renderer::render() {
@@ -435,6 +468,10 @@ void Renderer::renderDeferred() {
             model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
         }
 
+        if (skybox != nullptr) {
+            skybox->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+        }
+
         deferredPBREffect.setViewMatrix(camera->getViewMatrix());
         deferredShadingEffect.setViewMatrix(camera->getViewMatrix());
 
@@ -459,13 +496,18 @@ void Renderer::renderDeferred() {
         model->draw(pbrEnabled ? MaterialType::deferred_pbr : MaterialType::deferred);
     }
 
+    if (skybox != nullptr) {
+        skybox->applyModelMatrix();
+        skybox->draw(pbrEnabled ? MaterialType::deferred_pbr : MaterialType::deferred);
+    }
+
     // render the ambient occlusion term
 
     if (pbrEnabled) {
         ssaoEffect.render(screenObject.vertexArray, deferredPBREffect.getPosition(), deferredPBREffect.getNormal());
         bloomEffect.render(screenObject.vertexArray, deferredPBREffect.getOutputTexture());
         // do the deferred lighting step
-        deferredPBREffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
+        deferredPBREffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture(), ibl.getDiffuseIrradiance());
     } else {
         ssaoEffect.render(screenObject.vertexArray, deferredShadingEffect.getPosition(), deferredShadingEffect.getNormal());
         bloomEffect.render(screenObject.vertexArray, deferredShadingEffect.getOutputTexture());

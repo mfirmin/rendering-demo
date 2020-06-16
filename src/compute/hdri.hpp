@@ -11,7 +11,7 @@
 
 class HDRI {
     public:
-        HDRI(std::string filename);
+        HDRI();
 
         HDRI(HDRI&& other) = default;
         HDRI& operator=(HDRI&& other) = default;
@@ -19,7 +19,7 @@ class HDRI {
         HDRI(const HDRI& other) = default;
         HDRI& operator=(const HDRI& other) = default;
 
-        void initialize();
+        void initialize(std::string f);
 
         void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
 
@@ -38,7 +38,7 @@ class HDRI {
         static constexpr unsigned int CUBE_FACES = 6;
         // Since diffuse irradiance doesn't vary much over N, we can store
         // a very low detailed texture
-        static constexpr unsigned int TEXTURE_WIDTH = 512;
+        static constexpr unsigned int TEXTURE_WIDTH = 4096;
         static constexpr unsigned int TEXTURE_HEIGHT = TEXTURE_WIDTH;
 
         static constexpr glm::vec3 ZERO = glm::vec3(0.0f, 0.0f, 0.0f);

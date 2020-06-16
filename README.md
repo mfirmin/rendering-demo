@@ -61,6 +61,7 @@ make
 - `O`: Toggle SSAO on/off (default on) (enable primary lighting to see effects)
 - `P`: Toggle PBR on/off
 - `M`: Cycle through PBR materials for model (metallic, glossy, rough, rough metal) (default: metallic)
+- `Z`: Toggle IBL on/off (default off)
 
 
 # Credits

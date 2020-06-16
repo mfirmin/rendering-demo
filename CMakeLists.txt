@@ -55,6 +55,7 @@ set(SOURCES
     src/material/deferredPBR.cpp
     src/material/material.cpp
     src/material/skybox.cpp
+    src/material/skyboxDeferred.cpp
     src/mesh.cpp
     src/model.cpp
     src/renderer.cpp
