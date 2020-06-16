@@ -52,6 +52,8 @@ class Material {
             const glm::mat4& modelMatrix
         );
 
+        virtual void setUniforms() {}
+
         bool compile(std::string vertexShader, std::string fragmentShader);
 
         GLuint getProgram() {

@@ -4,6 +4,8 @@
 #include "gl/shaderUtils.hpp"
 #include "light/light.hpp"
 #include "material/material.hpp"
+#include "material/skybox.hpp"
+#include "material/skyboxDeferred.hpp"
 #include "model.hpp"
 #include "renderTarget.hpp"
 
@@ -107,8 +109,11 @@ bool Renderer::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     // Enable writing to depth buffer
     glDepthMask(GL_TRUE);
+
+    // necessary for cubemaps to work correctly
+    glDepthFunc(GL_LEQUAL);
     // Enable MultiSampling
-    glEnable(GL_MULTISAMPLE);
+    // glEnable(GL_MULTISAMPLE);
     // Enable face culling
     glEnable(GL_CULL_FACE);
 
@@ -231,9 +236,9 @@ void Renderer::initializeCompositingPass() {
     compositingPass.program = ShaderUtils::compile(vertexShaderSource, fragmentShaderSource);
 
     glUseProgram(compositingPass.program);
-    glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), 1.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "hdrEnabled"), hdrEnabled ? 1.0f : 0.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "gammaCorrectionEnabled"), gammaCorrectionEnabled ? 1.0f : 0.0f);
+    glUniform1f(glGetUniformLocation(compositingPass.program, "bloomEnabled"), bloomEnabled ? 1.0f : 0.0f);
     glUniform1f(glGetUniformLocation(compositingPass.program, "exposure"), 1.0f);
     glUseProgram(0);
 }
@@ -312,6 +317,12 @@ void Renderer::toggleHDR() {
     glUseProgram(0);
 }
 
+void Renderer::toggleIBL() {
+    iblEnabled = !iblEnabled;
+    deferredShadingEffect.toggleIBL(iblEnabled);
+    deferredPBREffect.toggleIBL(iblEnabled);
+}
+
 void Renderer::toggleMSAA() {
     if (MSAAEnabled) {
         glDisable(GL_MULTISAMPLE);
@@ -349,12 +360,41 @@ void Renderer::setExposure(float value) {
     glUseProgram(0);
 }
 
+void Renderer::setEnvironmentMap(std::string file) {
+    environmentMap.initialize(file);
+
+    ibl.initialize(environmentMap.getCubemap());
+
+    std::shared_ptr<Mesh> skyboxMesh = std::make_shared<Mesh>();
+    skyboxMesh->fromOBJ("assets/unit_cube.obj");
+
+    std::unique_ptr<Material> skyboxMaterial = std::make_unique<SkyboxMaterial>(environmentMap.getCubemap());
+
+    skyboxMaterial->setSide(Side::BACK);
+
+    std::unique_ptr<Material> skyboxDeferredMaterial = std::make_unique<SkyboxDeferredMaterial>(environmentMap.getCubemap());
+
+    skyboxDeferredMaterial->setSide(Side::BACK);
+
+    std::unique_ptr<Material> skyboxDeferredPBR = std::make_unique<SkyboxDeferredMaterial>(environmentMap.getCubemap());
+
+    skyboxDeferredPBR->setSide(Side::BACK);
+
+    skybox = std::make_shared<Model>(skyboxMesh, std::move(skyboxMaterial));
+
+    skybox->addMaterial(MaterialType::deferred, std::move(skyboxDeferredMaterial));
+    skybox->addMaterial(MaterialType::deferred_pbr, std::move(skyboxDeferredPBR));
+}
+
 void Renderer::render() {
+    glViewport(0, 0, width, height);
+
     auto msFBO = sceneTarget->getMultiSampleFramebuffer();
     auto outFBO = sceneTarget->getOutputFramebuffer();
     // Bind the scene buffer
     glBindFramebuffer(GL_FRAMEBUFFER, msFBO);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (camera->isDirty()) {
@@ -372,6 +412,8 @@ void Renderer::render() {
         model->applyModelMatrix();
         model->draw(MaterialType::standard);
     }
+
+    glUseProgram(0);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, msFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, outFBO);
@@ -408,6 +450,8 @@ void Renderer::render() {
 }
 
 void Renderer::renderDeferred() {
+    glViewport(0, 0, width, height);
+
     GLuint deferredBuffer = 0;
     if (pbrEnabled) {
         deferredBuffer = deferredPBREffect.getFramebuffer();
@@ -422,6 +466,10 @@ void Renderer::renderDeferred() {
     if (camera->isDirty()) {
         for (auto& model : models) {
             model->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
+        }
+
+        if (skybox != nullptr) {
+            skybox->setProjectionAndViewMatrices(camera->getProjectionMatrix(), camera->getViewMatrix());
         }
 
         deferredPBREffect.setViewMatrix(camera->getViewMatrix());
@@ -448,13 +496,18 @@ void Renderer::renderDeferred() {
         model->draw(pbrEnabled ? MaterialType::deferred_pbr : MaterialType::deferred);
     }
 
+    if (skybox != nullptr) {
+        skybox->applyModelMatrix();
+        skybox->draw(pbrEnabled ? MaterialType::deferred_pbr : MaterialType::deferred);
+    }
+
     // render the ambient occlusion term
 
     if (pbrEnabled) {
         ssaoEffect.render(screenObject.vertexArray, deferredPBREffect.getPosition(), deferredPBREffect.getNormal());
         bloomEffect.render(screenObject.vertexArray, deferredPBREffect.getOutputTexture());
         // do the deferred lighting step
-        deferredPBREffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture());
+        deferredPBREffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture(), ibl.getDiffuseIrradiance());
     } else {
         ssaoEffect.render(screenObject.vertexArray, deferredShadingEffect.getPosition(), deferredShadingEffect.getNormal());
         bloomEffect.render(screenObject.vertexArray, deferredShadingEffect.getOutputTexture());
@@ -508,6 +561,31 @@ void Renderer::renderDeferred() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glUseProgram(0);
     }
+
+    // Swap
+    SDL_GL_SwapWindow(window);
+}
+
+void Renderer::renderIBLTest(HDRI& environmentMap) {
+    glViewport(0, 0, width, height);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    // Clear it
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // render the screen object to it (using the scene render target)
+    glBindVertexArray(screenObject.vertexArray);
+    glUseProgram(compositingPass.program);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, environmentMap.getTexture());
+
+    glUniform1i(glGetUniformLocation(compositingPass.program, "scene"), 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glUseProgram(0);
 
     // Swap
     SDL_GL_SwapWindow(window);

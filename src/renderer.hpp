@@ -1,5 +1,8 @@
 #pragma once
 
+#include "compute/hdri.hpp"
+#include "compute/ibl.hpp"
+
 #include "renderEffects/bloom.hpp"
 #include "renderEffects/deferredShading.hpp"
 #include "renderEffects/deferredPBR.hpp"
@@ -16,6 +19,7 @@
 class Camera;
 class Light;
 class Model;
+class HDRI;
 
 class RenderTarget;
 
@@ -34,6 +38,8 @@ class Renderer {
 
         void render();
         void renderDeferred();
+        void renderIBLTest(HDRI& environmentMap);
+
         void toggleBloom();
         void toggleMSAA();
         void toggleFXAA();
@@ -42,9 +48,11 @@ class Renderer {
         void toggleGammaCorrection();
         void toggleSSAO();
         void togglePBR();
+        void toggleIBL();
         void updateCameraRotation(glm::vec3 r);
 
         void setExposure(float value);
+        void setEnvironmentMap(std::string file);
 
         ~Renderer();
     private:
@@ -61,6 +69,11 @@ class Renderer {
         std::vector<std::shared_ptr<Light>> lights;
 
         std::unique_ptr<RenderTarget> sceneTarget;
+
+        HDRI environmentMap;
+        IBL ibl;
+
+        std::shared_ptr<Model> skybox = nullptr;
 
         struct {
             GLuint vertexArray = 0;
@@ -88,9 +101,10 @@ class Renderer {
         bool blinnPhongShadingEnabled = true;
         bool hdrEnabled = true;
         bool gammaCorrectionEnabled = true;
-        bool bloomEnabled = true;
+        bool bloomEnabled = false;
         bool ssaoEnabled = true;
         bool pbrEnabled = true;
+        bool iblEnabled = false;
 
         bool initializeSDL();
         bool initializeGL();

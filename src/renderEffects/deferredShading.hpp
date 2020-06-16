@@ -66,6 +66,7 @@ class DeferredShadingEffect {
 
         void toggleBlinnPhongShading(bool value);
         void toggleSSAO(bool value);
+        void toggleIBL(bool value);
 
         void render(GLuint vao, GLuint ambientOcclusion);
     private:

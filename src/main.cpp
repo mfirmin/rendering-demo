@@ -53,14 +53,13 @@ int main(int argc, char* argv[]) {
         0.2f
     );
 
-    auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+    auto camera = std::make_unique<Camera>(aspect, 45.0f, -8.000f, glm::vec3(0.0f, 0.0f, 0.0f));
     auto renderer = Renderer(width, height, std::move(camera));
-
-    sun->toggle();
-    sun2->toggle();
 
     renderer.addLight(sun);
     renderer.addLight(sun2);
+
+    renderer.setEnvironmentMap("assets/images/grand_canyon.hdr");
 
     // std::shared_ptr<Mesh> teapotMesh = std::make_shared<Mesh>();
     // teapotMesh->fromOBJ("assets/teapot.obj");
@@ -132,7 +131,7 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<Model> box = std::make_shared<Model>(boxMesh, std::move(boxMaterial));
     box->addMaterial(MaterialType::deferred, std::move(boxDeferredMaterial));
     box->addMaterial(MaterialType::deferred_pbr, std::move(boxPBRMaterial));
-    renderer.addModel(box);
+    // renderer.addModel(box);
 
 
     int lamp1Intensity = 2;
@@ -276,6 +275,8 @@ int main(int argc, char* argv[]) {
                             bunny->setRoughness(0.2);
                             bunny->setMetalness(1.0);
                         }
+                    } else if (key == "Z") {
+                        renderer.toggleIBL();
                     }
                 }
             }
@@ -284,6 +285,8 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
+            // renderer.renderIBLTest(hdri);
+            // renderer.render();
             renderer.renderDeferred();
             last = now;
         }

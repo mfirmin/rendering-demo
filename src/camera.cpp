@@ -27,7 +27,7 @@ Camera::Camera(
 Camera::~Camera() {}
 
 glm::mat4 Camera::getProjectionMatrix() {
-    return glm::perspective(fov, aspect, near, far);
+    return glm::perspective(glm::radians(fov), aspect, near, far);
 }
 
 glm::mat4 Camera::getViewMatrix() {

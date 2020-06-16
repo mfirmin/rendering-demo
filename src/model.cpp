@@ -133,6 +133,7 @@ void Model::draw(MaterialType type) const {
         return;
     }
 
+    materials.at(type)->setUniforms();
     glUseProgram(materials.at(type)->getProgram());
 
     auto side = materials.at(type)->getSide();
