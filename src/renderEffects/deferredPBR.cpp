@@ -446,7 +446,7 @@ void DeferredPBREffect::createProgram() {
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "ssaoEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(program, "emissiveEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(program, "iblEnabled"), 0.0f);
+    glUniform1f(glGetUniformLocation(program, "iblEnabled"), 1.0f);
     glUseProgram(0);
 }
 

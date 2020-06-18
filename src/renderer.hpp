@@ -104,7 +104,7 @@ class Renderer {
         bool bloomEnabled = false;
         bool ssaoEnabled = true;
         bool pbrEnabled = true;
-        bool iblEnabled = false;
+        bool iblEnabled = true;
 
         bool initializeSDL();
         bool initializeGL();
