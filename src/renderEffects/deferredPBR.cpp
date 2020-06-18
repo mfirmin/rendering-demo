@@ -252,6 +252,9 @@ void DeferredPBREffect::createProgram() {
 
         // IBL
         uniform samplerCube diffuseIrradianceMap;
+        // Specular IBL
+        uniform samplerCube prefilteredEnvironmentMap;
+        uniform sampler2D integratedBRDFMap;
 
         in vec2 vUv;
 
@@ -385,7 +388,8 @@ void DeferredPBREffect::createProgram() {
 
                 outColor += ambient;
             } else {
-                vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+                float nDotV = max(dot(N, V), 0.0);
+                vec3 kS = fresnelSchlickRoughness(nDotV, F0, roughness);
                 vec3 kD = 1.0 - kS;
                 kD *= (1.0 - metalness);
 
@@ -393,9 +397,15 @@ void DeferredPBREffect::createProgram() {
                 // diffuse term is scene irradiance * albedo scaled by ambient occlusion
                 // Note that diffuse and ambient are now combined into one term,
                 // rather than having a separate ambient term (which was a hack anyway)
-                vec3 diffuse = kD * irradiance * inColor * ao;
+                vec3 diffuse = kD * irradiance * inColor;
 
-                outColor += diffuse;
+                vec3 R = reflect(-V, N);
+                const float MAX_REFLECTION_LOD = 4.0;
+                vec3 prefilteredColor = textureLod(prefilteredEnvironmentMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+                vec2 envBRDF = texture(integratedBRDFMap, vec2(nDotV, roughness)).rg;
+                vec3 specular = prefilteredColor * (kS * envBRDF.x + envBRDF.y);
+
+                outColor += (diffuse + specular) * ao;
             }
 
             if (emissiveEnabled > 0.5f) {
@@ -436,7 +446,7 @@ void DeferredPBREffect::createProgram() {
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "ssaoEnabled"), 1.0f);
     glUniform1f(glGetUniformLocation(program, "emissiveEnabled"), 1.0f);
-    glUniform1f(glGetUniformLocation(program, "iblEnabled"), 0.0f);
+    glUniform1f(glGetUniformLocation(program, "iblEnabled"), 1.0f);
     glUseProgram(0);
 }
 
@@ -540,7 +550,13 @@ void DeferredPBREffect::toggleIBL(bool value) {
     glUseProgram(0);
 }
 
-void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion, GLuint diffuseIrradianceMap) {
+void DeferredPBREffect::render(
+    GLuint vao,
+    GLuint ambientOcclusion,
+    GLuint diffuseIrradianceMap,
+    GLuint prefilteredEnvironmentMap,
+    GLuint integratedBRDFMap
+) {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it
@@ -573,6 +589,12 @@ void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion, GLuint diffu
     glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_CUBE_MAP, diffuseIrradianceMap);
 
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilteredEnvironmentMap);
+
+    glActiveTexture(GL_TEXTURE8);
+    glBindTexture(GL_TEXTURE_2D, integratedBRDFMap);
+
     glUniform1i(glGetUniformLocation(deferredProgram, "gPosition"), 0);
     glUniform1i(glGetUniformLocation(deferredProgram, "gNormal"), 1);
     glUniform1i(glGetUniformLocation(deferredProgram, "gAlbedo"), 2);
@@ -580,6 +602,8 @@ void DeferredPBREffect::render(GLuint vao, GLuint ambientOcclusion, GLuint diffu
     glUniform1i(glGetUniformLocation(deferredProgram, "gRoughnessAndMetalness"), 4);
     glUniform1i(glGetUniformLocation(deferredProgram, "ambientOcclusion"), 5);
     glUniform1i(glGetUniformLocation(deferredProgram, "diffuseIrradianceMap"), 6);
+    glUniform1i(glGetUniformLocation(deferredProgram, "prefilteredEnvironmentMap"), 7);
+    glUniform1i(glGetUniformLocation(deferredProgram, "integratedBRDFMap"), 8);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

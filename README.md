@@ -1,7 +1,7 @@
 # 3D Rendering Demo
 Demo of various advanced 3D rendering techniques, implemented with SDL2 and OpenGL 
 
-![demo](./emissive.png)
+![demo](./ibl.png)
 
 Many of these techniques are based on the Advanced Lighting tutorials found here: https://learnopengl.com/
 
@@ -22,9 +22,9 @@ TODO
   - [X] Deferred Shading
   - [X] SSAO
   - [X] PBR
-  - [ ] Image-Based Ambient Lighting
+  - [X] Image-Based Ambient Lighting
       - [X] Diffuse Irradiance
-      - [ ] Specular
+      - [X] Specular
 - [X] Environment Maps
 - [ ] Add Control Panel rather than keyboard shortcuts
 
@@ -61,7 +61,7 @@ make
 - `O`: Toggle SSAO on/off (default on) (enable primary lighting to see effects)
 - `P`: Toggle PBR on/off
 - `M`: Cycle through PBR materials for model (metallic, glossy, rough, rough metal) (default: metallic)
-- `Z`: Toggle IBL on/off (default off)
+- `Z`: Toggle IBL on/off (default on)
 
 
 # Credits
