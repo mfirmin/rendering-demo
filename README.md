@@ -37,29 +37,29 @@ TODO
 # How to build and run
 On linux (not yet tested on macOS), 
 ```
-git clone git@github.com:mfirmin/model-viewer.git
-cd model-viewer
+git clone git@github.com:mfirmin/rendering-demo.git
+cd rendering-demo
 mkdir build
 cd build
 ln -s ../assets .
 cmake ..
 make
-./modelviewer
+./demo
 ```
 
 # Usage
 
-- `A`: Toggle AntiAliasing (default on)
-- `L`: Toggle Primary Lighting (default off)
-- `1-4`: Toggle Scene Lights (default on)
+- `A`: Toggle FXAA AntiAliasing (default on)
+- `L`: Toggle Directional Lighting (default off)
+- `1-4`: Toggle Scene Lights (default off)
 - `S`: Toggle Blinn-Phong shading on/off (default on)
 - `H`: Toggle HDR (default on)
 - `E`: Cycle through Exposure values (0.1, 0.2, 0.4, 0.8, 1.0, 2.0, 5.0, 10.0) (default = 1.0)
 - `G`: Toggle Gamma Correction (default on)
 - `I`: Cycle through different intensities (1, 2, 4, 8, 16) for light 1 (useful for seeing the effects of HDR)
-- `B`: Toggle Bloom on/off (default on)
-- `O`: Toggle SSAO on/off (default on) (enable primary lighting to see effects)
-- `P`: Toggle PBR on/off
+- `B`: Toggle Bloom on/off (default off)
+- `O`: Toggle SSAO on/off (default on)
+- `P`: Toggle PBR on/off (default on)
 - `M`: Cycle through PBR materials for model (metallic, glossy, rough, rough metal) (default: metallic)
 - `Z`: Toggle IBL on/off (default on)
 
