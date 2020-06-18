@@ -13,7 +13,7 @@ TODO
 - [X] Basic Lighting
   - [X] Point Lights
   - [X] Directional Lights
-- [ ] Advanced Lighting
+- [X] Advanced Lighting
   - [X] Blinn-Phong Shading
   - [X] Gamma Correction
   - [X] Emissive Lighting
