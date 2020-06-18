@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(modelviewer)
+project(demo)
 
 # cmake_policy(SET CMP0072 NEW)
 
@@ -23,15 +23,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/build)
 find_package(SDL2 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
-# find_package(Freetype REQUIRED)
-# find_package(nlohmann_json REQUIRED)
 
 # add the include (header) directories for sdl2 and glew
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
-# include_directories(${FREETYPE_INCLUDE_DIRS})
 include_directories(src include)
-#include_directories(${OpenGL_INCLUDE_DIRS})
 
 # sld2 has some weird extra whitespace that breaks things?
 string(STRIP ${SDL2_INCLUDE_DIRS} SDL2_INCLUDE_DIRS)
@@ -69,12 +65,11 @@ set(SOURCES
 )
 
 # Add the executable
-add_executable(modelviewer 
+add_executable(demo 
     src/main.cpp
     ${SOURCES}
 )
 # Link libraries as necessary
-target_link_libraries(modelviewer ${SDL2_LIBRARIES})
-target_link_libraries(modelviewer ${FREETYPE_LIBRARIES})
-target_link_libraries(modelviewer ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
-# target_link_libraries(modelviewer nlohmann_json::nlohmann_json)
+target_link_libraries(demo ${SDL2_LIBRARIES})
+target_link_libraries(demo ${FREETYPE_LIBRARIES})
+target_link_libraries(demo ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
