@@ -117,6 +117,9 @@ bool Renderer::initializeGL() {
     // Enable face culling
     glEnable(GL_CULL_FACE);
 
+    // seamless sampling of texture cubes, necessary for prefiltered map
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
     return true;
 }
 
@@ -363,7 +366,7 @@ void Renderer::setExposure(float value) {
 void Renderer::setEnvironmentMap(std::string file) {
     environmentMap.initialize(file);
 
-    ibl.initialize(environmentMap.getCubemap());
+    ibl.initialize(environmentMap.getCubemap(), screenObject.vertexArray);
 
     std::shared_ptr<Mesh> skyboxMesh = std::make_shared<Mesh>();
     skyboxMesh->fromOBJ("assets/unit_cube.obj");

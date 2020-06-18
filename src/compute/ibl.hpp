@@ -20,10 +20,18 @@ class IBL {
         IBL(const IBL& other) = default;
         IBL& operator=(const IBL& other) = default;
 
-        void initialize(GLuint em);
+        void initialize(GLuint em, GLuint vao);
 
         GLuint getDiffuseIrradiance() {
-            return diffuseIrradianceTexture;
+            return diffuseIrradianceMap;
+        }
+
+        GLuint getPrefilteredMap() {
+            return prefilterMap;
+        }
+
+        GLuint getIntegratedBRDFMap() {
+            return integratedBRDFMap;
         }
 
         void setEnvironmentMap(GLuint em);
@@ -33,8 +41,15 @@ class IBL {
         static constexpr unsigned int CUBE_FACES = 6;
         // Since diffuse irradiance doesn't vary much over N, we can store
         // a very low detailed texture
-        static constexpr unsigned int TEXTURE_WIDTH = 32;
-        static constexpr unsigned int TEXTURE_HEIGHT = TEXTURE_WIDTH;
+        static constexpr unsigned int DIFFUSE_IRRADIANCE_TEXTURE_WIDTH = 32;
+        static constexpr unsigned int DIFFUSE_IRRADIANCE_TEXTURE_HEIGHT = DIFFUSE_IRRADIANCE_TEXTURE_WIDTH;
+
+        static constexpr unsigned int PREFILTERED_TEXTURE_MIPMAP_LEVELS = 5;
+        static constexpr unsigned int PREFILTERED_TEXTURE_WIDTH = 128;
+        static constexpr unsigned int PREFILTERED_TEXTURE_HEIGHT = PREFILTERED_TEXTURE_WIDTH;
+
+        static constexpr unsigned int INTEGRATED_BRDF_TEXTURE_WIDTH = 512;
+        static constexpr unsigned int INTEGRATED_BRDF_TEXTURE_HEIGHT = INTEGRATED_BRDF_TEXTURE_WIDTH;
 
         static constexpr glm::vec3 ZERO = glm::vec3(0.0f, 0.0f, 0.0f);
         static constexpr glm::vec3 LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
@@ -47,9 +62,19 @@ class IBL {
         int width = 0;
         int height = 0;
 
+        GLuint screenVertexArray = 0;
+
         GLuint environmentMap = 0;
-        GLuint diffuseIrradianceTexture = 0;
+        GLuint diffuseIrradianceMap = 0;
         GLuint diffuseIrradianceProgram = 0;
+
+        // Prefiltered environment map for the specular term
+        GLuint prefilterMap = 0;
+        GLuint prefilterProgram = 0;
+
+        // IntegratedBRDF Map
+        GLuint integratedBRDFMap = 0;
+        GLuint integrateBRDFProgram = 0;
 
         // fbo used in the process of creating the cubemap
         GLuint fbo = 0;
@@ -69,9 +94,19 @@ class IBL {
 
         Mesh cubeMesh;
 
-        void createTexture();
-        void createProgram();
+        void createFramebuffer();
+
+        void createDiffuseIrradianceMap();
+        void createPrefilteredEnvironmentMap();
+        void createIntegratedBRDFMap();
+
+        void loadDiffuseIrradianceProgram();
+        void loadPrefilteredEnvironmentProgram();
+        void loadIntegrateBRDFProgram();
+
         // Input: Environment cubemap texture
         // Output: Sets the diffuseIrradianceTexture to the convolved environmentMap
         void renderToDiffuseIrradiance();
+        void renderToPrefilterMap();
+        void renderToIntegratedBRDFMap();
 };
