@@ -510,7 +510,13 @@ void Renderer::renderDeferred() {
         ssaoEffect.render(screenObject.vertexArray, deferredPBREffect.getPosition(), deferredPBREffect.getNormal());
         bloomEffect.render(screenObject.vertexArray, deferredPBREffect.getOutputTexture());
         // do the deferred lighting step
-        deferredPBREffect.render(screenObject.vertexArray, ssaoEffect.getAmbientOcculsionTexture(), ibl.getDiffuseIrradiance());
+        deferredPBREffect.render(
+            screenObject.vertexArray,
+            ssaoEffect.getAmbientOcculsionTexture(),
+            ibl.getDiffuseIrradiance(),
+            ibl.getPrefilteredMap(),
+            ibl.getIntegratedBRDFMap()
+        );
     } else {
         ssaoEffect.render(screenObject.vertexArray, deferredShadingEffect.getPosition(), deferredShadingEffect.getNormal());
         bloomEffect.render(screenObject.vertexArray, deferredShadingEffect.getOutputTexture());
