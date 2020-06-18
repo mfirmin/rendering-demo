@@ -1,7 +1,7 @@
 # 3D Rendering Demo
 Demo of various advanced 3D rendering techniques, implemented with SDL2 and OpenGL 
 
-![demo](./emissive.png)
+![demo](./ibl.png)
 
 Many of these techniques are based on the Advanced Lighting tutorials found here: https://learnopengl.com/
 
