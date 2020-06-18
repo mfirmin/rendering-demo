@@ -22,9 +22,9 @@ TODO
   - [X] Deferred Shading
   - [X] SSAO
   - [X] PBR
-  - [ ] Image-Based Ambient Lighting
+  - [X] Image-Based Ambient Lighting
       - [X] Diffuse Irradiance
-      - [ ] Specular
+      - [X] Specular
 - [X] Environment Maps
 - [ ] Add Control Panel rather than keyboard shortcuts
 
