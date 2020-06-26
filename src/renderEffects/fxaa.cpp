@@ -95,8 +95,8 @@ void FXAAEffect::createProgram() {
 
             // 3. Get the remaining corners
             float DL = computeLuma(textureOffset(input, vUv, ivec2(-1, -1)).rgb);
-            float DR = computeLuma(textureOffset(input, vUv, ivec2(-1, 1)).rgb);
-            float UL = computeLuma(textureOffset(input, vUv, ivec2(1, -1)).rgb);
+            float DR = computeLuma(textureOffset(input, vUv, ivec2(1, -1)).rgb);
+            float UL = computeLuma(textureOffset(input, vUv, ivec2(-1, 1)).rgb);
             float UR = computeLuma(textureOffset(input, vUv, ivec2(1, 1)).rgb);
 
             float DU = D + U;
