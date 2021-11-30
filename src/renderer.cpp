@@ -13,8 +13,8 @@
 
 #include <iostream>
 
-constexpr GLuint GL_MAJOR = 3;
-constexpr GLuint GL_MINOR = 3;
+const GLuint GL_MAJOR = 3;
+const GLuint GL_MINOR = 3;
 
 Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
     width(width),

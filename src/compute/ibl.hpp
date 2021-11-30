@@ -41,23 +41,18 @@ class IBL {
         static constexpr unsigned int CUBE_FACES = 6;
         // Since diffuse irradiance doesn't vary much over N, we can store
         // a very low detailed texture
-        static constexpr unsigned int DIFFUSE_IRRADIANCE_TEXTURE_WIDTH = 32;
-        static constexpr unsigned int DIFFUSE_IRRADIANCE_TEXTURE_HEIGHT = DIFFUSE_IRRADIANCE_TEXTURE_WIDTH;
+        static const unsigned int DIFFUSE_IRRADIANCE_TEXTURE_WIDTH;
+        static const unsigned int DIFFUSE_IRRADIANCE_TEXTURE_HEIGHT;
 
-        static constexpr unsigned int PREFILTERED_TEXTURE_MIPMAP_LEVELS = 5;
-        static constexpr unsigned int PREFILTERED_TEXTURE_WIDTH = 128;
-        static constexpr unsigned int PREFILTERED_TEXTURE_HEIGHT = PREFILTERED_TEXTURE_WIDTH;
+        static const unsigned int PREFILTERED_TEXTURE_MIPMAP_LEVELS;
+        static const unsigned int PREFILTERED_TEXTURE_WIDTH;
+        static const unsigned int PREFILTERED_TEXTURE_HEIGHT;
 
-        static constexpr unsigned int INTEGRATED_BRDF_TEXTURE_WIDTH = 512;
-        static constexpr unsigned int INTEGRATED_BRDF_TEXTURE_HEIGHT = INTEGRATED_BRDF_TEXTURE_WIDTH;
+        static const unsigned int INTEGRATED_BRDF_TEXTURE_WIDTH;
+        static const unsigned int INTEGRATED_BRDF_TEXTURE_HEIGHT;
 
-        static constexpr glm::vec3 ZERO = glm::vec3(0.0f, 0.0f, 0.0f);
-        static constexpr glm::vec3 LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
-        static constexpr glm::vec3 RIGHT= glm::vec3(1.0f, 0.0f, 0.0f);
-        static constexpr glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
-        static constexpr glm::vec3 DOWN = glm::vec3(0.0f, -1.0f, 0.0f);
-        static constexpr glm::vec3 FORWARD = glm::vec3(0.0f, 0.0f, 1.0f);
-        static constexpr glm::vec3 BACKWARD = glm::vec3(0.0f, 0.0f, -1.0f);
+        // lookAt(position, target, up)
+        static const std::array<glm::mat4, CUBE_FACES> VIEW_MATRICES;
 
         int width = 0;
         int height = 0;
@@ -81,16 +76,6 @@ class IBL {
         GLuint depthBuffer = 0;
 
         glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-
-        // lookAt(position, target, up)
-        std::array<glm::mat4, CUBE_FACES> viewMatrices = {
-            glm::lookAt(ZERO, RIGHT, DOWN),
-            glm::lookAt(ZERO, LEFT, DOWN),
-            glm::lookAt(ZERO, UP, FORWARD),
-            glm::lookAt(ZERO, DOWN, BACKWARD),
-            glm::lookAt(ZERO, FORWARD, DOWN),
-            glm::lookAt(ZERO, BACKWARD, DOWN)
-        };
 
         Mesh cubeMesh;
 

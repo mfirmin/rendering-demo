@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-constexpr float DEFAULT_NEAR = 0.01f;
-constexpr float DEFAULT_FAR = 100.0f;
+const float DEFAULT_NEAR = 0.01f;
+const float DEFAULT_FAR = 100.0f;
 
 // TODO: Orthographic Camera support
 class Camera {

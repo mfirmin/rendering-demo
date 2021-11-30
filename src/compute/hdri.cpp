@@ -156,7 +156,7 @@ void HDRI::renderToCubemap() {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     for (unsigned int i = 0; i < CUBE_FACES; i++) {
-        glUniformMatrix4fv(glGetUniformLocation(cubemapProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrices.at(i)));
+        glUniformMatrix4fv(glGetUniformLocation(cubemapProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(VIEW_MATRICES.at(i)));
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubemapTexture, 0);
@@ -196,3 +196,24 @@ void HDRI::renderCube() {
     glCullFace(GL_BACK);
     glUseProgram(0);
 }
+
+const unsigned int HDRI::TEXTURE_WIDTH = 4096;
+const unsigned int HDRI::TEXTURE_HEIGHT = 4096;
+
+const glm::vec3 ZERO = glm::vec3(0.0f, 0.0f, 0.0f);
+const glm::vec3 LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
+const glm::vec3 RIGHT= glm::vec3(1.0f, 0.0f, 0.0f);
+const glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
+const glm::vec3 DOWN = glm::vec3(0.0f, -1.0f, 0.0f);
+const glm::vec3 FORWARD = glm::vec3(0.0f, 0.0f, 1.0f);
+const glm::vec3 BACKWARD = glm::vec3(0.0f, 0.0f, -1.0f);
+
+const std::array<glm::mat4, HDRI::CUBE_FACES> HDRI::VIEW_MATRICES = {
+    glm::lookAt(ZERO, RIGHT, DOWN),
+    glm::lookAt(ZERO, LEFT, DOWN),
+    glm::lookAt(ZERO, UP, FORWARD),
+    glm::lookAt(ZERO, DOWN, BACKWARD),
+    glm::lookAt(ZERO, FORWARD, DOWN),
+    glm::lookAt(ZERO, BACKWARD, DOWN)
+};
+

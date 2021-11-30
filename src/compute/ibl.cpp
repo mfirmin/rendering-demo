@@ -281,7 +281,7 @@ void IBL::renderToDiffuseIrradiance() {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     for (unsigned int i = 0; i < CUBE_FACES; i++) {
-        glUniformMatrix4fv(glGetUniformLocation(diffuseIrradianceProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrices.at(i)));
+        glUniformMatrix4fv(glGetUniformLocation(diffuseIrradianceProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(VIEW_MATRICES.at(i)));
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, diffuseIrradianceMap, 0);
@@ -327,7 +327,7 @@ void IBL::renderToPrefilterMap() {
         glUniform1f(glGetUniformLocation(prefilterProgram, "roughness"), roughness);
 
         for (unsigned int i = 0; i < CUBE_FACES; i++) {
-            glUniformMatrix4fv(glGetUniformLocation(prefilterProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrices.at(i)));
+            glUniformMatrix4fv(glGetUniformLocation(prefilterProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(VIEW_MATRICES.at(i)));
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mipmapLevel);
@@ -372,3 +372,33 @@ void IBL::setEnvironmentMap(GLuint em) {
     renderToPrefilterMap();
     renderToIntegratedBRDFMap();
 }
+
+// Since diffuse irradiance doesn't vary much over N, we can store
+// a very low detailed texture
+const unsigned int IBL::DIFFUSE_IRRADIANCE_TEXTURE_WIDTH = 32;
+const unsigned int IBL::DIFFUSE_IRRADIANCE_TEXTURE_HEIGHT = DIFFUSE_IRRADIANCE_TEXTURE_WIDTH;
+
+const unsigned int IBL::PREFILTERED_TEXTURE_MIPMAP_LEVELS = 5;
+const unsigned int IBL::PREFILTERED_TEXTURE_WIDTH = 128;
+const unsigned int IBL::PREFILTERED_TEXTURE_HEIGHT = PREFILTERED_TEXTURE_WIDTH;
+
+const unsigned int IBL::INTEGRATED_BRDF_TEXTURE_WIDTH = 512;
+const unsigned int IBL::INTEGRATED_BRDF_TEXTURE_HEIGHT = INTEGRATED_BRDF_TEXTURE_WIDTH;
+
+const glm::vec3 ZERO = glm::vec3(0.0f, 0.0f, 0.0f);
+const glm::vec3 LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
+const glm::vec3 RIGHT= glm::vec3(1.0f, 0.0f, 0.0f);
+const glm::vec3 UP = glm::vec3(0.0f, 1.0f, 0.0f);
+const glm::vec3 DOWN = glm::vec3(0.0f, -1.0f, 0.0f);
+const glm::vec3 FORWARD = glm::vec3(0.0f, 0.0f, 1.0f);
+const glm::vec3 BACKWARD = glm::vec3(0.0f, 0.0f, -1.0f);
+
+const std::array<glm::mat4, IBL::CUBE_FACES> IBL::VIEW_MATRICES = {
+    glm::lookAt(ZERO, RIGHT, DOWN),
+    glm::lookAt(ZERO, LEFT, DOWN),
+    glm::lookAt(ZERO, UP, FORWARD),
+    glm::lookAt(ZERO, DOWN, BACKWARD),
+    glm::lookAt(ZERO, FORWARD, DOWN),
+    glm::lookAt(ZERO, BACKWARD, DOWN)
+};
+

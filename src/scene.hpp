@@ -32,7 +32,7 @@ class Scene {
             rough_metal // metal = 1, roughness = 1
         };
 
-        static const std::vector<float> exposureValues;
+        static const std::vector<float> EXPOSURE_VALUES;
         static const float ONE_SECOND;
         static const float FPS;
 

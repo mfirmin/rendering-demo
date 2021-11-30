@@ -193,11 +193,11 @@ void Scene::go() {
                         renderer->toggleSSAO();
                     } else if (key == "E") {
                         exposure++;
-                        if (exposure >= exposureValues.size()) {
+                        if (exposure >= EXPOSURE_VALUES.size()) {
                             exposure = 0;
                         }
 
-                        renderer->setExposure(exposureValues.at(exposure));
+                        renderer->setExposure(EXPOSURE_VALUES.at(exposure));
                     } else if (key == "P") {
                         renderer->togglePBR();
                     } else if (key == "M") {
@@ -237,7 +237,7 @@ void Scene::go() {
     }
 }
 
-const std::vector<float> Scene::exposureValues = {
+const std::vector<float> Scene::EXPOSURE_VALUES = {
     0.1f,
     0.2f,
     0.5f,
