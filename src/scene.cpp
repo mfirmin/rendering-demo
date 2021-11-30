@@ -98,6 +98,8 @@ void Scene::initialize() {
     bunny->addMaterial(MaterialType::deferred_pbr, std::move(pbrMaterial));
 
     renderer->addModel(bunny);
+
+    model = bunny;
 }
 
 void Scene::createLamp(
