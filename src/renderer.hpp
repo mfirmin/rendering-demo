@@ -33,6 +33,8 @@ class Renderer {
         Renderer(const Renderer& other) = delete;
         Renderer& operator=(const Renderer& other) = delete;
 
+        ~Renderer();
+
         void addModel(std::shared_ptr<Model> model);
         void addLight(std::shared_ptr<Light> light);
 
@@ -54,7 +56,6 @@ class Renderer {
         void setExposure(float value);
         void setEnvironmentMap(std::string file);
 
-        ~Renderer();
     private:
         SDL_Window* window = nullptr;
         SDL_Surface* screen = nullptr;

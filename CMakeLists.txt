@@ -62,6 +62,7 @@ set(SOURCES
     src/renderEffects/fxaa.cpp
     src/renderEffects/ssao.cpp
     src/renderTarget.cpp
+    src/scene.cpp
 )
 
 # Add the executable
