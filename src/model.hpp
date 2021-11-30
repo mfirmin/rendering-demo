@@ -32,10 +32,7 @@ class Model {
         Model(const Model& other) = delete;
         Model& operator=(const Model& other) = delete;
 
-        // Cannot use = default; as the compiler will complain about calling the destructor
-        // of incomplete types
-        // Therefore we have to define this in the .cpp file (even if it does nothing)
-        ~Model();
+        ~Model() = default;
 
         void setColor(glm::vec3 color);
         void setEmissiveColorAndStrength(glm::vec3 color, float strength);

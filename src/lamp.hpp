@@ -31,10 +31,7 @@ class Lamp {
         Lamp(const Lamp& other) = default;
         Lamp& operator=(const Lamp& other) = default;
 
-        // Cannot use = default; as the compiler will complain about calling the destructor
-        // of incomplete types
-        // Therefore we have to define this in the .cpp file (even if it does nothing)
-        ~Lamp();
+        ~Lamp() = default;
 
         void toggle();
 

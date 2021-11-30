@@ -139,5 +139,3 @@ void DeferredPBRMaterial::setMetalness(float metalness) {
     glUniform1f(metalnessLocation, metalness);
     glUseProgram(0);
 }
-
-DeferredPBRMaterial::~DeferredPBRMaterial() {}

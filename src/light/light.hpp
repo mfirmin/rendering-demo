@@ -51,7 +51,8 @@ class Light {
 
         virtual LightInfo getLightInfo() const = 0;
 
-        virtual ~Light() {};
+        virtual ~Light() = default;
+
     protected:
         glm::vec3 color;
         float intensity;

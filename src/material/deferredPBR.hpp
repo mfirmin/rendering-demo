@@ -11,7 +11,7 @@
 class DeferredPBRMaterial : public Material {
     public:
         DeferredPBRMaterial(glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0), float roughness = 0.5f, float metalness = 0.0f);
-        ~DeferredPBRMaterial();
+        ~DeferredPBRMaterial() = default;
 
         DeferredPBRMaterial(DeferredPBRMaterial&& other) = default;
         DeferredPBRMaterial(const DeferredPBRMaterial& other) = default;

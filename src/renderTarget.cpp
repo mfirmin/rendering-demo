@@ -63,5 +63,11 @@ RenderTarget::RenderTarget(int w, int h) :
 }
 
 RenderTarget::~RenderTarget() {
-    // TODO: Free buffers
+    glDeleteTextures(1, &texture);
+
+    glDeleteRenderbuffers(1, &depthBuffer);
+    glDeleteRenderbuffers(1, &colorBuffer);
+
+    glDeleteFramebuffers(1, &msFBO);
+    glDeleteFramebuffers(1, &outFBO);
 }

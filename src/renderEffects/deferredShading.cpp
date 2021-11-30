@@ -105,7 +105,17 @@ void DeferredShadingEffect::initialize() {
 }
 
 DeferredShadingEffect::~DeferredShadingEffect() {
-    // TODO: Free buffers
+    glDeleteTextures(1, &outputTexture);
+    glDeleteTextures(1, &normalTexture);
+    glDeleteTextures(1, &albedoTexture);
+    glDeleteTextures(1, &emissiveTexture);
+
+    glDeleteRenderbuffers(1, &depthBuffer);
+
+    glDeleteFramebuffers(1, &outputFbo);
+
+    glDeleteProgram(debugProgram);
+    glDeleteProgram(program);
 }
 
 void DeferredShadingEffect::createOutput() {

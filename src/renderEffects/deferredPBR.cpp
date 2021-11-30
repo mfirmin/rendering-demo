@@ -131,7 +131,20 @@ void DeferredPBREffect::initialize() {
 }
 
 DeferredPBREffect::~DeferredPBREffect() {
-    // TODO: Free buffers
+    glDeleteTextures(1, &outputTexture);
+    glDeleteTextures(1, &positionTexture);
+    glDeleteTextures(1, &normalTexture);
+    glDeleteTextures(1, &albedoTexture);
+    glDeleteTextures(1, &emissiveTexture);
+    glDeleteTextures(1, &roughnessAndMetalnessTexture);
+
+    glDeleteRenderbuffers(1, &depthBuffer);
+
+    glDeleteFramebuffers(1, &outputFbo);
+    glDeleteFramebuffers(1, &fbo);
+
+    glDeleteProgram(program);
+    glDeleteProgram(debugProgram);
 }
 
 void DeferredPBREffect::createOutput() {

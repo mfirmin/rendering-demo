@@ -11,7 +11,7 @@
 class SkyboxMaterial : public Material {
     public:
         SkyboxMaterial(GLuint cubemap);
-        virtual ~SkyboxMaterial();
+        ~SkyboxMaterial() = default;
 
         SkyboxMaterial(SkyboxMaterial&& other) = default;
         SkyboxMaterial(const SkyboxMaterial& other) = default;

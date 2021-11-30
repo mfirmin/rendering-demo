@@ -90,5 +90,3 @@ void SkyboxDeferredMaterial::setUniforms() {
     glUseProgram(0);
 }
 
-SkyboxDeferredMaterial::~SkyboxDeferredMaterial() {}
-

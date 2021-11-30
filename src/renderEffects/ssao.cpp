@@ -16,7 +16,12 @@ SSAOEffect::SSAOEffect(int w, int h) :
 {}
 
 SSAOEffect::~SSAOEffect() {
-    // TODO: Free buffers
+    glDeleteTextures(1, &ambientOcclusionTexture);
+    glDeleteTextures(1, &kernelNoiseTexture);
+    glDeleteFramebuffers(1, &fbo);
+
+    glDeleteProgram(program);
+    glDeleteProgram(debugProgram);
 }
 
 // Must call this AFTER GL/SDL have been initialized

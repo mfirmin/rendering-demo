@@ -104,5 +104,3 @@ void DeferredMaterial::create() {
     glUniform1f(emissiveEnabledLocation, 0.0f);
     glUseProgram(0);
 }
-
-DeferredMaterial::~DeferredMaterial() {}

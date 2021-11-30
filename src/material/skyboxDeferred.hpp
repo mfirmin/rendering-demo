@@ -11,7 +11,7 @@
 class SkyboxDeferredMaterial : public Material {
     public:
         SkyboxDeferredMaterial(GLuint cubemap);
-        virtual ~SkyboxDeferredMaterial();
+        ~SkyboxDeferredMaterial() = default;
 
         SkyboxDeferredMaterial(SkyboxDeferredMaterial&& other) = default;
         SkyboxDeferredMaterial(const SkyboxDeferredMaterial& other) = default;

@@ -67,8 +67,6 @@ Lamp::Lamp(
 
 }
 
-Lamp::~Lamp() {}
-
 void Lamp::toggle() {
     light->toggle();
 

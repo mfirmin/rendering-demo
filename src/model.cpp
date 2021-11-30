@@ -24,8 +24,6 @@ Model::Model(std::shared_ptr<Mesh> m, std::unique_ptr<Material>&& mat) :
     materials.emplace(MaterialType::standard, std::move(mat));
 }
 
-Model::~Model() {}
-
 Model::Model(Model&& other) {
     mesh = std::move(other.mesh);
     materials = std::move(other.materials);

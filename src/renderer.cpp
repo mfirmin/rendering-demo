@@ -57,6 +57,17 @@ Renderer::Renderer(int width, int height, std::unique_ptr<Camera>&& camera) :
 }
 
 Renderer::~Renderer() {
+    glDeleteVertexArrays(1, &screenObject.vertexArray);
+    glDeleteBuffers(1, &screenObject.vertexBuffer);
+    glDeleteBuffers(1, &screenObject.uvBuffer);
+
+    glDeleteTextures(1, &compositingPass.result);
+
+    glDeleteFramebuffers(1, &compositingPass.fbo);
+
+    glDeleteProgram(compositingPass.program);
+    glDeleteProgram(baseProgram);
+
     SDL_DestroyWindow(window);
 
     window = nullptr;
@@ -493,7 +504,7 @@ void Renderer::renderDeferred() {
     }
 
     // ensure models have deferred material applied
-    // todo: support multiple materials per model
+    // TODO: support multiple materials per model
     for (auto& model : models) {
         model->applyModelMatrix();
         model->draw(pbrEnabled ? MaterialType::deferred_pbr : MaterialType::deferred);

@@ -25,7 +25,7 @@ class Camera {
         Camera& operator=(const Camera& other) = default;
         Camera& operator=(Camera&& other) = default;
 
-        ~Camera();
+        ~Camera() = default;
 
         void setRotation(glm::vec3 r) {
             rotation = r;

@@ -15,6 +15,13 @@ GLObject::GLObject(
     setNormals(std::move(ns));
 }
 
+GLObject::~GLObject() {
+    glDeleteVertexArrays(1, &vertexArrayObject);
+
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteBuffers(1, &normalBuffer);
+}
+
 void GLObject::createVertexArrayObject() {
     glGenVertexArrays(1, &vertexArrayObject);
 }

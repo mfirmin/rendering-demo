@@ -9,7 +9,7 @@ class GLObject {
     public:
         GLObject();
         GLObject(std::vector<float>&& vs, std::vector<float>&& ns);
-        ~GLObject() = default;
+        ~GLObject();
 
         GLObject(GLObject&& other) = default;
         GLObject(const GLObject& other) = default;

@@ -8,6 +8,7 @@
 
 class Light;
 
+// TODO(mfirmin): This and DeferredShadingEffect should both inherit from a shared parent class
 class DeferredPBREffect {
     public:
         DeferredPBREffect(int width, int height);

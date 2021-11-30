@@ -11,7 +11,13 @@ BloomEffect::BloomEffect(int w, int h) :
 {}
 
 BloomEffect::~BloomEffect() {
-    // TODO: Free buffers
+    glDeleteFramebuffers(1, &framebuffer);
+    glDeleteTextures(1, &brightnessTexture);
+    glDeleteFramebuffers(2, blurFBOs.data());
+    glDeleteTextures(2, blurTextures.data());
+
+    glDeleteProgram(brightnessProgram);
+    glDeleteProgram(blurProgram);
 }
 
 // Must call this AFTER GL/SDL have been initialized
@@ -197,11 +203,9 @@ void BloomEffect::render(GLuint vao, GLuint sceneTexture) {
 
     glUseProgram(0);
 
-
     // At this point, the brightnessTexture attached to the framebuffer should contain
     // only the bright points of the scene
     // Now we need to blur it.
-
 
     int horizontal = 1;
     bool first = true;

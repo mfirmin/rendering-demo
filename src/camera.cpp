@@ -24,8 +24,6 @@ Camera::Camera(
     far(far)
 {}
 
-Camera::~Camera() {}
-
 glm::mat4 Camera::getProjectionMatrix() {
     return glm::perspective(glm::radians(fov), aspect, near, far);
 }

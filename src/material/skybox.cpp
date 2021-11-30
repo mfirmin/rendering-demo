@@ -84,5 +84,3 @@ void SkyboxMaterial::setUniforms() {
     glUseProgram(0);
 }
 
-SkyboxMaterial::~SkyboxMaterial() {}
-

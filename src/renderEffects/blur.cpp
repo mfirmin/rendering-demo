@@ -12,7 +12,10 @@ BlurEffect::BlurEffect(int w, int h) :
 {}
 
 BlurEffect::~BlurEffect() {
-    // TODO: Free buffers
+    glDeleteFramebuffers(1, &fbo);
+    glDeleteTextures(1, &result);
+
+    glDeleteProgram(program);
 }
 
 // Must call this AFTER GL/SDL have been initialized

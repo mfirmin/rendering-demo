@@ -31,7 +31,16 @@ void IBL::initialize(GLuint em, GLuint vao) {
 
 
 IBL::~IBL() {
-    // TODO: Free buffers
+    glDeleteTextures(1, &diffuseIrradianceMap);
+    glDeleteTextures(1, &prefilterMap);
+    glDeleteTextures(1, &integratedBRDFMap);
+    glDeleteRenderbuffers(1, &depthBuffer);
+
+    glDeleteFramebuffers(1, &fbo);
+
+    glDeleteProgram(diffuseIrradianceProgram);
+    glDeleteProgram(prefilterProgram);
+    glDeleteProgram(integrateBRDFProgram);
 }
 
 void IBL::createFramebuffer() {

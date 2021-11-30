@@ -186,7 +186,9 @@ void Material::create() {
     glUseProgram(0);
 }
 
-Material::~Material() {}
+Material::~Material() {
+    glDeleteProgram(program);
+}
 
 bool Material::compile(std::string vertexShader, std::string fragmentShader) {
     program = ShaderUtils::compile(vertexShader, fragmentShader);

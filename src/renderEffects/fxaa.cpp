@@ -12,7 +12,8 @@ FXAAEffect::FXAAEffect(int w, int h) :
 {}
 
 FXAAEffect::~FXAAEffect() {
-    // TODO: Free buffers
+    // FXAA doesn't have any framebuffers,textures,etc to delete, as it renders straight to the screen
+    glDeleteProgram(program);
 }
 
 // Must call this AFTER GL/SDL have been initialized

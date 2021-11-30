@@ -27,7 +27,13 @@ void HDRI::initialize(std::string f) {
 
 
 HDRI::~HDRI() {
-    // TODO: Free buffers
+    glDeleteTextures(1, &texture);
+    glDeleteTextures(1, &cubemapTexture);
+    glDeleteRenderbuffers(1, &depthBuffer);
+
+    glDeleteFramebuffers(1, &fbo);
+
+    glDeleteProgram(cubemapProgram);
 }
 
 void HDRI::loadTexture() {

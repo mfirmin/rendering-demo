@@ -22,7 +22,7 @@ class SpotLight : public Light {
         SpotLight(const SpotLight& other) = default;
         SpotLight& operator=(const SpotLight& other) = default;
 
-        ~SpotLight() {};
+        ~SpotLight() = default;
 
         LightInfo getLightInfo() const override;
     private:

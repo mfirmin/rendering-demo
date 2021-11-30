@@ -20,7 +20,7 @@ class PointLight : public Light {
         PointLight(const PointLight& other) = default;
         PointLight& operator=(const PointLight& other) = default;
 
-        ~PointLight() {};
+        ~PointLight() = default;
 
         void setPosition(glm::vec3 p) {
             position = p;

@@ -19,7 +19,7 @@ class DirectionalLight : public Light {
         DirectionalLight(const DirectionalLight& other) = default;
         DirectionalLight& operator=(const DirectionalLight& other) = default;
 
-        ~DirectionalLight() {};
+        ~DirectionalLight() = default;
 
         LightInfo getLightInfo() const override;
     private:
