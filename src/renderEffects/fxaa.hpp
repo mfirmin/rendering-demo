@@ -19,7 +19,7 @@ class FXAAEffect {
 
         void initialize();
 
-        void render(GLuint vao, GLuint input);
+        void render(GLuint vao, GLuint input) const;
     private:
         int width;
         int height;

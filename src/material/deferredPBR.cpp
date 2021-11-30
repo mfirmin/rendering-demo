@@ -122,7 +122,7 @@ void DeferredPBRMaterial::create() {
     glUseProgram(0);
 }
 
-void DeferredPBRMaterial::setRoughness(float roughness) {
+void DeferredPBRMaterial::setRoughness(float roughness) const {
     GLuint shader = getProgram();
     glUseProgram(shader);
 
@@ -131,7 +131,7 @@ void DeferredPBRMaterial::setRoughness(float roughness) {
     glUseProgram(0);
 }
 
-void DeferredPBRMaterial::setMetalness(float metalness) {
+void DeferredPBRMaterial::setMetalness(float metalness) const {
     GLuint shader = getProgram();
     glUseProgram(shader);
 

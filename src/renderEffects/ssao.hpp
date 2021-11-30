@@ -21,23 +21,23 @@ class SSAOEffect {
 
         void initialize();
 
-        void render(GLuint vao, GLuint gPosition, GLuint gNormal);
+        void render(GLuint vao, GLuint gPosition, GLuint gNormal) const;
 
-        void renderDebug(GLuint vao);
+        void renderDebug(GLuint vao) const;
 
         void setProjectionMatrix(
             const glm::mat4& projectionMatrix
-        );
+        ) const;
 
-        GLuint getFramebuffer() {
+        GLuint getFramebuffer() const {
             return fbo;
         }
 
-        GLuint getRawAmbientOcculsionTexture() {
+        GLuint getRawAmbientOcculsionTexture() const {
             return ambientOcclusionTexture;
         }
 
-        GLuint getAmbientOcculsionTexture() {
+        GLuint getAmbientOcculsionTexture() const {
             return blurEffect.getResult();
         }
     private:

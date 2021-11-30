@@ -400,7 +400,7 @@ void Renderer::setEnvironmentMap(std::string file) {
     skybox->addMaterial(MaterialType::deferred_pbr, std::move(skyboxDeferredPBR));
 }
 
-void Renderer::render() {
+void Renderer::render() const {
     glViewport(0, 0, width, height);
 
     auto msFBO = sceneTarget->getMultiSampleFramebuffer();
@@ -463,7 +463,7 @@ void Renderer::render() {
     SDL_GL_SwapWindow(window);
 }
 
-void Renderer::renderDeferred() {
+void Renderer::renderDeferred() const {
     glViewport(0, 0, width, height);
 
     GLuint deferredBuffer = 0;
@@ -586,7 +586,7 @@ void Renderer::renderDeferred() {
     SDL_GL_SwapWindow(window);
 }
 
-void Renderer::renderIBLTest(HDRI& environmentMap) {
+void Renderer::renderIBLTest(const HDRI& environmentMap) const {
     glViewport(0, 0, width, height);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

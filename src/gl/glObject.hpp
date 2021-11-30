@@ -20,11 +20,11 @@ class GLObject {
         void setVertices(std::vector<float>&& vertices);
         void setNormals(std::vector<float>&& normals);
 
-        GLuint getVertexArrayObject() {
+        GLuint getVertexArrayObject() const {
             return vertexArrayObject;
         }
 
-        uint32_t getVertexCount() {
+        uint32_t getVertexCount() const {
             return vertexCount;
         }
     private:

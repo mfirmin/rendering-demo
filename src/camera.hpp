@@ -37,7 +37,7 @@ class Camera {
             dirty = true;
         }
 
-        bool isDirty() {
+        bool isDirty() const {
             return dirty;
         }
 
@@ -47,8 +47,8 @@ class Camera {
 
         void addRotation(glm::vec3 r);
 
-        glm::mat4 getProjectionMatrix();
-        glm::mat4 getViewMatrix();
+        glm::mat4 getProjectionMatrix() const;
+        glm::mat4 getViewMatrix() const;
     private:
         float aspect;
         float fov;

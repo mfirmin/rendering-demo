@@ -21,10 +21,10 @@ class DeferredPBRMaterial : public Material {
 
         void create() override;
 
-        void setRoughness(float roughness) override;
-        void setMetalness(float metalness) override;
+        void setRoughness(float roughness) const override;
+        void setMetalness(float metalness) const override;
 
-        void setLights(const std::vector<std::shared_ptr<Light>>& lights) override { (void)lights; }
+        void setLights(const std::vector<std::shared_ptr<Light>>& lights) const override { (void)lights; }
     private:
         float roughness;
         float metalness;

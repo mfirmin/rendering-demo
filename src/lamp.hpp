@@ -42,11 +42,11 @@ class Lamp {
         void setScale(glm::vec3 s);
         void setScale(float s);
 
-        std::shared_ptr<Model> getModel() {
+        std::shared_ptr<Model> getModel() const {
             return model;
         }
 
-        std::shared_ptr<PointLight> getLight() {
+        std::shared_ptr<PointLight> getLight() const {
             return light;
         }
     private:

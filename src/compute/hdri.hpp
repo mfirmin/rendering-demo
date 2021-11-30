@@ -21,17 +21,17 @@ class HDRI {
 
         void initialize(std::string f);
 
-        void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
+        void setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix) const;
 
-        GLuint getTexture() {
+        GLuint getTexture() const {
             return texture;
         }
 
-        GLuint getCubemap() {
+        GLuint getCubemap() const {
             return cubemapTexture;
         }
 
-        void renderCube();
+        void renderCube() const;
 
         ~HDRI();
     private:

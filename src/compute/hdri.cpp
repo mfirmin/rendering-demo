@@ -172,7 +172,7 @@ void HDRI::renderToCubemap() {
     glCullFace(GL_BACK);
 }
 
-void HDRI::setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix) {
+void HDRI::setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix) const {
     glUseProgram(cubemapProgram);
     auto projectionMatrixLocation = glGetUniformLocation(cubemapProgram, "projectionMatrix");
     auto viewMatrixLocation = glGetUniformLocation(cubemapProgram, "viewMatrix");
@@ -181,7 +181,7 @@ void HDRI::setProjectionAndViewMatrices(const glm::mat4& projectionMatrix, const
     glUseProgram(0);
 }
 
-void HDRI::renderCube() {
+void HDRI::renderCube() const {
     glUseProgram(cubemapProgram);
     glCullFace(GL_FRONT);
 

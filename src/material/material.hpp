@@ -23,40 +23,40 @@ class Material {
 
         virtual void create();
 
-        virtual void setColor(glm::vec3 color);
+        virtual void setColor(glm::vec3 color) const;
 
-        virtual void setShininess(float shininess);
+        virtual void setShininess(float shininess) const;
 
-        virtual void setLights(const std::vector<std::shared_ptr<Light>>& lights);
+        virtual void setLights(const std::vector<std::shared_ptr<Light>>& lights) const;
 
-        virtual void setEmissiveColorAndStrength(glm::vec3 color, float strength);
-        virtual void setEmissiveColor(glm::vec3 color);
-        virtual void setEmissiveStrength(float strength);
+        virtual void setEmissiveColorAndStrength(glm::vec3 color, float strength) const;
+        virtual void setEmissiveColor(glm::vec3 color) const;
+        virtual void setEmissiveStrength(float strength) const;
 
-        virtual void toggleEmissive(bool value);
-        virtual void toggleBlinnPhongShading(bool value);
+        virtual void toggleEmissive(bool value) const;
+        virtual void toggleBlinnPhongShading(bool value) const;
 
-        virtual void setModelMatrix(const glm::mat4& modelMatrix);
+        virtual void setModelMatrix(const glm::mat4& modelMatrix) const;
 
-        virtual void setMetalness(float metalness) { (void)metalness; }
-        virtual void setRoughness(float roughness) { (void)roughness; }
+        virtual void setMetalness(float metalness) const { (void)metalness; }
+        virtual void setRoughness(float roughness) const { (void)roughness; }
 
         virtual void setProjectionAndViewMatrices(
             const glm::mat4& projectionMatrix,
             const glm::mat4& viewMatrix
-        );
+        ) const;
 
         virtual void setMatrices(
             const glm::mat4& projectionMatrix,
             const glm::mat4& viewMatrix,
             const glm::mat4& modelMatrix
-        );
+        ) const;
 
-        virtual void setUniforms() {}
+        virtual void setUniforms() const {}
 
         bool compile(std::string vertexShader, std::string fragmentShader);
 
-        GLuint getProgram() {
+        GLuint getProgram() const {
             return program;
         }
 
@@ -64,19 +64,19 @@ class Material {
             side = s;
         }
 
-        Side getSide() {
+        Side getSide() const {
             return side;
         }
 
-        glm::vec3 getColor() {
+        glm::vec3 getColor() const {
             return color;
         }
 
-        float getSpecularCoefficient() {
+        float getSpecularCoefficient() const {
             return specularCoefficient;
         }
 
-        float getShininess() {
+        float getShininess() const {
             return shininess;
         }
     private:

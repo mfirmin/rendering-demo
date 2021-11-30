@@ -238,14 +238,14 @@ void SSAOEffect::createDebugProgram() {
     debugProgram = ShaderUtils::compile(vertexShader, fragmentShader);
 }
 
-void SSAOEffect::setProjectionMatrix(const glm::mat4& projectionMatrix) {
+void SSAOEffect::setProjectionMatrix(const glm::mat4& projectionMatrix) const {
     glUseProgram(program);
     auto viewMatrixLocation = glGetUniformLocation(program, "projectionMatrix");
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUseProgram(0);
 }
 
-void SSAOEffect::render(GLuint vao, GLuint gPosition, GLuint gNormal) {
+void SSAOEffect::render(GLuint vao, GLuint gPosition, GLuint gNormal) const {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -283,7 +283,7 @@ void SSAOEffect::render(GLuint vao, GLuint gPosition, GLuint gNormal) {
 }
 
 // render the ambient occlusion texture to the screen
-void SSAOEffect::renderDebug(GLuint vao) {
+void SSAOEffect::renderDebug(GLuint vao) const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

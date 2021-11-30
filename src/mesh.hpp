@@ -18,11 +18,11 @@ class Mesh {
 
         Mesh& fromOBJ(std::string filename);
 
-        GLuint getVertexArrayObject() {
+        GLuint getVertexArrayObject() const {
             return vertexArrayObject->getVertexArrayObject();
         }
 
-        uint32_t getVertexCount() {
+        uint32_t getVertexCount() const {
             return vertexArrayObject->getVertexCount();
         }
     private:

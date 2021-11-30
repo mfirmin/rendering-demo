@@ -24,11 +24,11 @@ Camera::Camera(
     far(far)
 {}
 
-glm::mat4 Camera::getProjectionMatrix() {
+glm::mat4 Camera::getProjectionMatrix() const {
     return glm::perspective(glm::radians(fov), aspect, near, far);
 }
 
-glm::mat4 Camera::getViewMatrix() {
+glm::mat4 Camera::getViewMatrix() const {
     auto rot = glm::eulerAngleYX(rotation.y, rotation.x);
 
     auto position = glm::vec3(0.0f, 0.0f, -distance);

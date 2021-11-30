@@ -23,53 +23,53 @@ class DeferredShadingEffect {
 
         void initialize();
 
-        GLuint getDebugProgram() {
+        GLuint getDebugProgram() const {
             return debugProgram;
         }
 
-        GLuint getProgram() {
+        GLuint getProgram() const {
             return program;
         }
 
-        GLuint getFramebuffer() {
+        GLuint getFramebuffer() const {
             return fbo;
         }
 
-        GLuint getPosition() {
+        GLuint getPosition() const {
             return positionTexture;
         }
 
-        GLuint getNormal() {
+        GLuint getNormal() const {
             return normalTexture;
         }
 
-        GLuint getAlbedo() {
+        GLuint getAlbedo() const {
             return albedoTexture;
         }
 
-        GLuint getEmissive() {
+        GLuint getEmissive() const {
             return emissiveTexture;
         }
 
-        GLuint getOutputFramebuffer() {
+        GLuint getOutputFramebuffer() const {
             return outputFbo;
         }
 
-        GLuint getOutputTexture() {
+        GLuint getOutputTexture() const {
             return outputTexture;
         }
 
-        void setLights(const std::vector<std::shared_ptr<Light>>& lights);
+        void setLights(const std::vector<std::shared_ptr<Light>>& lights) const;
 
         void setViewMatrix(
             const glm::mat4& viewMatrix
-        );
+        ) const;
 
-        void toggleBlinnPhongShading(bool value);
-        void toggleSSAO(bool value);
-        void toggleIBL(bool value);
+        void toggleBlinnPhongShading(bool value) const;
+        void toggleSSAO(bool value) const;
+        void toggleIBL(bool value) const;
 
-        void render(GLuint vao, GLuint ambientOcclusion);
+        void render(GLuint vao, GLuint ambientOcclusion) const;
     private:
         int width;
         int height;

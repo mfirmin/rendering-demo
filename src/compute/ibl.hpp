@@ -22,15 +22,15 @@ class IBL {
 
         void initialize(GLuint em, GLuint vao);
 
-        GLuint getDiffuseIrradiance() {
+        GLuint getDiffuseIrradiance() const {
             return diffuseIrradianceMap;
         }
 
-        GLuint getPrefilteredMap() {
+        GLuint getPrefilteredMap() const {
             return prefilterMap;
         }
 
-        GLuint getIntegratedBRDFMap() {
+        GLuint getIntegratedBRDFMap() const {
             return integratedBRDFMap;
         }
 

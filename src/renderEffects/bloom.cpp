@@ -183,7 +183,7 @@ void BloomEffect::initializeBlurProgram() {
 }
 
 // vao should be a triangle strip quad
-void BloomEffect::render(GLuint vao, GLuint sceneTexture) {
+void BloomEffect::render(GLuint vao, GLuint sceneTexture) const {
     // bind the framebuffer for the bloom effect
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 

@@ -87,7 +87,7 @@ void BlurEffect::createProgram() {
 }
 
 
-void BlurEffect::render(GLuint vao, GLuint input) {
+void BlurEffect::render(GLuint vao, GLuint input) const {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     glClearColor(0.0, 0.0, 0.0, 0.0);

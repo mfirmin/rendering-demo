@@ -463,7 +463,7 @@ void DeferredPBREffect::createProgram() {
     glUseProgram(0);
 }
 
-void DeferredPBREffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
+void DeferredPBREffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) const {
     std::size_t lightIndex = 0;
 
     glUseProgram(program);
@@ -542,21 +542,21 @@ void DeferredPBREffect::setLights(const std::vector<std::shared_ptr<Light>>& lig
     glUseProgram(0);
 }
 
-void DeferredPBREffect::setViewMatrix(const glm::mat4& viewMatrix) {
+void DeferredPBREffect::setViewMatrix(const glm::mat4& viewMatrix) const {
     glUseProgram(program);
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUseProgram(0);
 }
 
-void DeferredPBREffect::toggleSSAO(bool value) {
+void DeferredPBREffect::toggleSSAO(bool value) const {
     glUseProgram(program);
     auto ssaoEnabledLocation = glGetUniformLocation(program, "ssaoEnabled");
     glUniform1f(ssaoEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void DeferredPBREffect::toggleIBL(bool value) {
+void DeferredPBREffect::toggleIBL(bool value) const {
     glUseProgram(program);
     auto iblEnabledLocation = glGetUniformLocation(program, "iblEnabled");
     glUniform1f(iblEnabledLocation, value ? 1.0f : 0.0f);
@@ -569,7 +569,7 @@ void DeferredPBREffect::render(
     GLuint diffuseIrradianceMap,
     GLuint prefilteredEnvironmentMap,
     GLuint integratedBRDFMap
-) {
+) const {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it

@@ -80,7 +80,7 @@ void SkyboxDeferredMaterial::create() {
     glUseProgram(0);
 }
 
-void SkyboxDeferredMaterial::setUniforms() {
+void SkyboxDeferredMaterial::setUniforms() const {
     GLuint shader = getProgram();
     glUseProgram(shader);
     // bind the cubemap to texture slot 0 and update the uniform accordingly

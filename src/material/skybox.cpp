@@ -74,7 +74,7 @@ void SkyboxMaterial::create() {
     glUseProgram(0);
 }
 
-void SkyboxMaterial::setUniforms() {
+void SkyboxMaterial::setUniforms() const {
     GLuint shader = getProgram();
     glUseProgram(shader);
     // bind the cubemap to texture slot 0 and update the uniform accordingly

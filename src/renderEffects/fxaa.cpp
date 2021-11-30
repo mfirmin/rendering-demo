@@ -247,7 +247,7 @@ void FXAAEffect::createProgram() {
     glUseProgram(0);
 }
 
-void FXAAEffect::render(GLuint vao, GLuint input) {
+void FXAAEffect::render(GLuint vao, GLuint input) const {
     // FXAA is the final pass and is
     // rendered directly to the screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

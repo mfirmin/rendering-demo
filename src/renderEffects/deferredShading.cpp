@@ -355,7 +355,7 @@ void DeferredShadingEffect::createProgram() {
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
+void DeferredShadingEffect::setLights(const std::vector<std::shared_ptr<Light>>& lights) const {
     std::size_t lightIndex = 0;
 
     glUseProgram(program);
@@ -434,32 +434,32 @@ void DeferredShadingEffect::setLights(const std::vector<std::shared_ptr<Light>>&
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::setViewMatrix(const glm::mat4& viewMatrix) {
+void DeferredShadingEffect::setViewMatrix(const glm::mat4& viewMatrix) const {
     glUseProgram(program);
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::toggleBlinnPhongShading(bool value) {
+void DeferredShadingEffect::toggleBlinnPhongShading(bool value) const {
     glUseProgram(program);
     auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
     glUniform1f(blinnEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::toggleSSAO(bool value) {
+void DeferredShadingEffect::toggleSSAO(bool value) const {
     glUseProgram(program);
     auto ssaoEnabledLocation = glGetUniformLocation(program, "ssaoEnabled");
     glUniform1f(ssaoEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void DeferredShadingEffect::toggleIBL(bool value) {
+void DeferredShadingEffect::toggleIBL(bool value) const {
     (void)value;
 }
 
-void DeferredShadingEffect::render(GLuint vao, GLuint ambientOcclusion) {
+void DeferredShadingEffect::render(GLuint vao, GLuint ambientOcclusion) const {
     glBindFramebuffer(GL_FRAMEBUFFER, outputFbo);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // Clear it

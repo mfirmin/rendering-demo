@@ -196,14 +196,14 @@ bool Material::compile(std::string vertexShader, std::string fragmentShader) {
     return program != 0;
 }
 
-void Material::setColor(glm::vec3 color) {
+void Material::setColor(glm::vec3 color) const {
     glUseProgram(program);
     auto colorLocation = glGetUniformLocation(program, "color");
     glUniform3fv(colorLocation, 1, glm::value_ptr(color));
     glUseProgram(0);
 }
 
-void Material::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
+void Material::setEmissiveColorAndStrength(glm::vec3 color, float strength) const {
     glUseProgram(program);
     auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
     auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
@@ -212,41 +212,42 @@ void Material::setEmissiveColorAndStrength(glm::vec3 color, float strength) {
     glUseProgram(0);
 }
 
-void Material::setEmissiveColor(glm::vec3 color) {
+void Material::setEmissiveColor(glm::vec3 color) const {
     glUseProgram(program);
     auto emissiveColorLocation = glGetUniformLocation(program, "emissiveColor");
     glUniform3fv(emissiveColorLocation, 1, glm::value_ptr(color));
     glUseProgram(0);
 }
-void Material::setEmissiveStrength(float strength) {
+
+void Material::setEmissiveStrength(float strength) const {
     glUseProgram(program);
     auto emissiveStrengthLocation = glGetUniformLocation(program, "emissiveStrength");
     glUniform1f(emissiveStrengthLocation, strength);
     glUseProgram(0);
 }
 
-void Material::toggleEmissive(bool value) {
+void Material::toggleEmissive(bool value) const {
     glUseProgram(program);
     auto emissiveEnabledLocation = glGetUniformLocation(program, "emissiveEnabled");
     glUniform1f(emissiveEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void Material::toggleBlinnPhongShading(bool value) {
+void Material::toggleBlinnPhongShading(bool value) const {
     glUseProgram(program);
     auto blinnEnabledLocation = glGetUniformLocation(program, "blinnEnabled");
     glUniform1f(blinnEnabledLocation, value ? 1.0f : 0.0f);
     glUseProgram(0);
 }
 
-void Material::setShininess(float shininess) {
+void Material::setShininess(float shininess) const {
     glUseProgram(program);
     auto shininessLocation = glGetUniformLocation(program, "shininess");
     glUniform1f(shininessLocation, shininess);
     glUseProgram(0);
 }
 
-void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
+void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) const {
     std::size_t lightIndex = 0;
 
     glUseProgram(program);
@@ -325,7 +326,7 @@ void Material::setLights(const std::vector<std::shared_ptr<Light>>& lights) {
     glUseProgram(0);
 }
 
-void Material::setModelMatrix(const glm::mat4& modelMatrix) {
+void Material::setModelMatrix(const glm::mat4& modelMatrix) const {
     glUseProgram(program);
     auto modelMatrixLocation = glGetUniformLocation(program, "modelMatrix");
     glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
@@ -335,7 +336,7 @@ void Material::setModelMatrix(const glm::mat4& modelMatrix) {
 void Material::setProjectionAndViewMatrices(
     const glm::mat4& projectionMatrix,
     const glm::mat4& viewMatrix
-) {
+) const {
     glUseProgram(program);
     auto projectionMatrixLocation = glGetUniformLocation(program, "projectionMatrix");
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");
@@ -348,7 +349,7 @@ void Material::setMatrices(
     const glm::mat4& projectionMatrix,
     const glm::mat4& viewMatrix,
     const glm::mat4& modelMatrix
-) {
+) const {
     glUseProgram(program);
     auto projectionMatrixLocation = glGetUniformLocation(program, "projectionMatrix");
     auto viewMatrixLocation = glGetUniformLocation(program, "viewMatrix");

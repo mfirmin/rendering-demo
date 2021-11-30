@@ -17,13 +17,13 @@ class BloomEffect {
 
         void initialize();
 
-        void render(GLuint vao, GLuint sceneTexture);
+        void render(GLuint vao, GLuint sceneTexture) const;
 
-        GLuint getBrightnessTexture() {
+        GLuint getBrightnessTexture() const {
             return brightnessTexture;
         }
 
-        GLuint getBlurTexture() {
+        GLuint getBlurTexture() const {
             // the last texture rendered into will be first texture in the array
             return blurTextures.at(0);
         }

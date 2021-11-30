@@ -15,15 +15,15 @@ class RenderTarget {
 
         ~RenderTarget();
 
-        GLuint getMultiSampleFramebuffer() {
+        GLuint getMultiSampleFramebuffer() const {
             return msFBO;
         }
 
-        GLuint getOutputFramebuffer() {
+        GLuint getOutputFramebuffer() const {
             return outFBO;
         }
 
-        GLuint getTexture() {
+        GLuint getTexture() const {
             return texture;
         }
     private:

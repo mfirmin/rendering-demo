@@ -38,9 +38,9 @@ class Renderer {
         void addModel(std::shared_ptr<Model> model);
         void addLight(std::shared_ptr<Light> light);
 
-        void render();
-        void renderDeferred();
-        void renderIBLTest(HDRI& environmentMap);
+        void render() const;
+        void renderDeferred() const;
+        void renderIBLTest(const HDRI& environmentMap) const;
 
         void toggleBloom();
         void toggleMSAA();

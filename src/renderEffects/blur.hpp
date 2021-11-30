@@ -20,9 +20,9 @@ class BlurEffect {
 
         void initialize();
 
-        void render(GLuint vao, GLuint input);
+        void render(GLuint vao, GLuint input) const;
 
-        GLuint getResult() {
+        GLuint getResult() const {
             return result;
         }
     private:
